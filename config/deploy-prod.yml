@@ -1,0 +1,3 @@
+projectID: ${PROJECT_ID}
+buckets:
+  secretKeys: backend-token-keys

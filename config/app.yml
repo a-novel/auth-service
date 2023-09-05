@@ -1,0 +1,7 @@
+name: authentication-service
+
+frontend:
+  routes:
+    validateEmail: /external/validate-email
+    validateNewEmail: /external/validate-new-email
+    resetPassword: /external/password-reset

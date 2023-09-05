@@ -1,0 +1,8 @@
+apiKey: ${SENDGRID_API_KEY}
+sender:
+  email: noreply@agoradesecrivains.com
+  name: Agora des Écrivains
+templates:
+  emailValidation: "d-a80c26ecbbd64390b14b01164f48b506"
+  emailUpdate: "d-9243c048639b404c8faee145b9e6eb59"
+  passwordReset: "d-0bdf024cdeec44c1950aad35e191ad46"

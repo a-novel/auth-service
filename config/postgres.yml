@@ -1,0 +1,1 @@
+dsn: ${POSTGRES_URL}

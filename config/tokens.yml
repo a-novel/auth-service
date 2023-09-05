@@ -1,0 +1,5 @@
+# Expire token after 48h.
+ttl: 48h
+# Renew a token 24h before it expires. Both tokens will not be available together (despite being issued early, the
+# new token IAT is set to the current token EXP).
+renewDelta: 24h
