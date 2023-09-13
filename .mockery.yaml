@@ -1,0 +1,19 @@
+with-expecter: True
+quiet: False
+mockname: "{{.InterfaceName}}"
+packages:
+  github.com/a-novel/auth-service/pkg/dao:
+    config:
+      all: True
+      outpkg: daomocks
+      dir: pkg/dao/mocks
+  github.com/a-novel/auth-service/pkg/services:
+    config:
+      all: True
+      outpkg: servicesmocks
+      dir: pkg/services/mocks
+  github.com/a-novel/auth-service/framework:
+    config:
+      all: True
+      outpkg: frameworkmocks
+      dir: framework/mocks
