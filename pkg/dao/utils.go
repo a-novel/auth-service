@@ -24,11 +24,11 @@ type Email struct {
 	// Validation is the hashed key used to validate a user email. The raw key is sent to the email address only.
 	// When user manages to successfully prove its authenticity, the email is validated and this code is removed.
 	// Like a password, the raw key should never be stored or cached.
-	Validation string `json:"validationCode" bun:"validation_code"`
+	Validation string `bun:"validation_code"`
 	// User of the email. This is the unique name that comes before the provider.
-	User string `json:"user" bun:"user"`
+	User string `bun:"user"`
 	// Domain is the host of the mailing service provider, for example 'gmail.com'.
-	Domain string `json:"domain" bun:"domain"`
+	Domain string `bun:"domain"`
 }
 
 // String converts the email object back to the standard string representation, in the format [user]@[domain].
@@ -61,9 +61,9 @@ type Password struct {
 	// Validation is used to reset a password, for example when the original one has been forgotten. This field
 	// contains the hashed key only. The raw key is sent to the user through a secure channel (an email address),
 	// and once the user has managed to prove its identity, it can then create a new password.
-	Validation string `json:"validationCode" bun:"validation_code"`
+	Validation string `bun:"validation_code"`
 	// Hashed is the hashed password, used to validate user claims when trying to authenticate.
-	Hashed string `json:"hashed" bun:"hashed"`
+	Hashed string `bun:"hashed"`
 }
 
 // WhereEmail returns arguments for a bun Where clause, to search for a precise email value.

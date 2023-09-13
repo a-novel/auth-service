@@ -28,12 +28,11 @@ type ProfileModel struct {
 	ProfileModelCore
 }
 
-// ProfileModelCore contains the explicitly editable data of the ProfileModel.
 type ProfileModelCore struct {
 	// Username is a fake name displayed for a user.
-	Username string `json:"username" bun:"username"`
+	Username string `bun:"username"`
 	// Slug is the unique url suffix used to access the current profile.
-	Slug string `json:"slug" bun:"slug"`
+	Slug string `bun:"slug"`
 }
 
 func NewProfileRepository(db bun.IDB) ProfileRepository {
