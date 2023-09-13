@@ -24,12 +24,11 @@ type IdentityModel struct {
 	IdentityModelCore
 }
 
-// IdentityModelCore contains the explicitly editable data of the IdentityModel.
 type IdentityModelCore struct {
-	FirstName string     `json:"firstName" bun:"first_name"`
-	LastName  string     `json:"lastName" bun:"last_name"`
-	Birthday  time.Time  `json:"birthday" bun:"birthday"`
-	Sex       models.Sex `json:"sex" bun:"sex,notnull"`
+	FirstName string     `bun:"first_name"`
+	LastName  string     `bun:"last_name"`
+	Birthday  time.Time  `bun:"birthday"`
+	Sex       models.Sex `bun:"sex"`
 }
 
 func NewIdentityRepository(db bun.IDB) IdentityRepository {

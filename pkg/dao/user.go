@@ -19,7 +19,6 @@ type UserRepository interface {
 	List(ctx context.Context, ids []uuid.UUID) ([]*UserModel, error)
 }
 
-// UserModel aggregates all data of a user.
 type UserModel struct {
 	bun.BaseModel `bun:"table:users_view"`
 
@@ -27,7 +26,6 @@ type UserModel struct {
 	UserModelCore
 }
 
-// UserModelCore contains the explicitly editable data of the UserModel.
 type UserModelCore struct {
 	Credentials CredentialsModelCore `bun:"credentials"`
 	Identity    IdentityModelCore    `bun:"identity"`

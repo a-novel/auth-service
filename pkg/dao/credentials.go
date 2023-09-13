@@ -58,17 +58,16 @@ type CredentialsModel struct {
 	CredentialsModelCore
 }
 
-// CredentialsModelCore contains the explicitly editable data of the CredentialsModel.
 type CredentialsModelCore struct {
 	// Email is the main email address of a user, used to authenticate it and to communicate with.
-	Email Email `json:"email" bun:"embed:email_"`
+	Email Email `bun:"embed:email_"`
 	// NewEmail is set when user wants to change its email address. Because email is the primary way to
 	// authenticate a user, the Email value is not directly updated, but saved here in a pending state, with a
 	// Email.Validation code set.
 	// Once this email is validated, the Email field is updated, and this one is emptied.
-	NewEmail Email `json:"newEmail" bun:"embed:new_email_"`
+	NewEmail Email `bun:"embed:new_email_"`
 	// Password used to authenticate the user.
-	Password Password `json:"password" bun:"embed:password_"`
+	Password Password `bun:"embed:password_"`
 }
 
 func NewCredentialsRepository(db bun.IDB) CredentialsRepository {
