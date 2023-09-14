@@ -10,6 +10,7 @@ import (
 
 type Client interface {
 	IntrospectToken(ctx context.Context, token string) (*models.UserTokenStatus, error)
+	Ping() error
 }
 
 type clientImpl struct {
@@ -29,4 +30,13 @@ func (a *clientImpl) IntrospectToken(ctx context.Context, token string) (*models
 		SuccessStatuses: []int{http.StatusOK},
 		Client:          http.DefaultClient,
 	}, output)
+}
+
+func (a *clientImpl) Ping() error {
+	return client.MakeHTTPCall(context.Background(), client.HTTPCallConfig{
+		Path:            a.url.JoinPath("/ping"),
+		Method:          http.MethodGet,
+		SuccessStatuses: []int{http.StatusOK},
+		Client:          http.DefaultClient,
+	}, nil)
 }
