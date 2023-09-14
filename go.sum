@@ -12,8 +12,8 @@ cloud.google.com/go/storage v1.33.0/go.mod h1:Hhh/dogNRGca7IWv1RC2YqEn0c0G77ctA/
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/a-novel/bunovel v1.0.0 h1:KG/dwIddrDuMaH0e0f6aKF/uo03s/TnvtSOFkvzyV+Q=
 github.com/a-novel/bunovel v1.0.0/go.mod h1:nd7BYN2rVmDNVBJUfGtPae2zNSMtqJX02sy1JGPbkQo=
-github.com/a-novel/go-apis v1.0.0 h1:VFDjnW9+A1og2kF6NPXuSPVIz6tDe2aS1ImQTesUCwY=
-github.com/a-novel/go-apis v1.0.0/go.mod h1:TpBGLA4WPcOprcZqr9ul3zY9Q5xESG8yU7XHoEFwMaI=
+github.com/a-novel/go-apis v1.0.2 h1:p6jOSR3Kv9hMWqNKPpNWq2uKukUt8bzZeo8IMNn91d0=
+github.com/a-novel/go-apis v1.0.2/go.mod h1:TpBGLA4WPcOprcZqr9ul3zY9Q5xESG8yU7XHoEFwMaI=
 github.com/a-novel/go-framework v1.0.1 h1:5rV26w7Pr45uhXQPxYmHX1sDGj3gRou6eMuFarffA0c=
 github.com/a-novel/go-framework v1.0.1/go.mod h1:4IbRbEvzEROmAoIkprQTYLr7f2p/dfjTLk4WpQNub/A=
 github.com/a-novel/sendgrid-proxy v1.0.0 h1:1AnDDbY//vbYykKjrDmzBtBxjDenSzdAVBdqy+xhcXo=

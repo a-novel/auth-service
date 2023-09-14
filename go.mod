@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	cloud.google.com/go/storage v1.33.0
 	github.com/a-novel/bunovel v1.0.0
-	github.com/a-novel/go-apis v1.0.0
+	github.com/a-novel/go-apis v1.0.2
 	github.com/a-novel/go-framework v1.0.1
 	github.com/a-novel/sendgrid-proxy v1.0.0
 	github.com/gin-gonic/gin v1.9.1
