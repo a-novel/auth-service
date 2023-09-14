@@ -5,9 +5,8 @@ import (
 	"github.com/a-novel/auth-service/migrations"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
@@ -20,20 +19,20 @@ import (
 )
 
 func TestUserRepository_Create(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []interface{}{
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user2@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "slug-2",
 			},
@@ -67,10 +66,10 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:  test.NumberUUID(1),
+			id:  goframework.NumberUUID(1),
 			now: baseTime,
 			expect: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, nil),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, nil),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    MustParseEmail("user1@domain.com"),
@@ -105,10 +104,10 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:  test.NumberUUID(1),
+			id:  goframework.NumberUUID(1),
 			now: baseTime,
 			expect: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, nil),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, nil),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    MustParseEmailWithValidation("user1@domain.com", "validation-code"),
@@ -143,10 +142,10 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:  test.NumberUUID(1),
+			id:  goframework.NumberUUID(1),
 			now: baseTime,
 			expect: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, nil),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, nil),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    MustParseEmail("user1@domain.com"),
@@ -182,10 +181,10 @@ func TestUserRepository_Create(t *testing.T) {
 					Username: "username-1",
 				},
 			},
-			id:  test.NumberUUID(1),
+			id:  goframework.NumberUUID(1),
 			now: baseTime,
 			expect: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, nil),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, nil),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    MustParseEmail("user1@domain.com"),
@@ -221,9 +220,9 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       baseTime,
-			expectErr: errors.ErrUniqConstraintViolation,
+			expectErr: bunovel.ErrUniqConstraintViolation,
 		},
 		{
 			name: "Error/EmailUserMissing",
@@ -242,9 +241,9 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       baseTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 		{
 			name: "Error/EmailDomainMissing",
@@ -263,9 +262,9 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-1",
 				},
 			},
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       baseTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 		{
 			name: "Error/SlugTaken",
@@ -284,9 +283,9 @@ func TestUserRepository_Create(t *testing.T) {
 					Slug: "slug-2",
 				},
 			},
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       baseTime,
-			expectErr: errors.ErrUniqConstraintViolation,
+			expectErr: bunovel.ErrUniqConstraintViolation,
 		},
 		{
 			name: "Error/SlugMissing",
@@ -303,13 +302,13 @@ func TestUserRepository_Create(t *testing.T) {
 				},
 				Profile: dao.ProfileModelCore{},
 			},
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       baseTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -326,21 +325,21 @@ func TestUserRepository_Create(t *testing.T) {
 }
 
 func TestUserRepository_Search(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []interface{}{
 		// User 1
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("elon.bezos@space-origin.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Elon",
 				LastName:  "Bezos",
@@ -349,7 +348,7 @@ func TestUserRepository_Search(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "space-origin",
 			},
@@ -357,14 +356,14 @@ func TestUserRepository_Search(t *testing.T) {
 
 		// User 2
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("jeff.musk@amazon.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Jeff",
 				LastName:  "Bezos",
@@ -373,7 +372,7 @@ func TestUserRepository_Search(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "big-brother",
 			},
@@ -381,14 +380,14 @@ func TestUserRepository_Search(t *testing.T) {
 
 		// User 3
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("sarasaka@corpo.plaza"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Saburo",
 				LastName:  "Arasaka",
@@ -397,7 +396,7 @@ func TestUserRepository_Search(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug:     "i-dont-have-any-ideas-anymore",
 				Username: "Mikoshi",
@@ -406,14 +405,14 @@ func TestUserRepository_Search(t *testing.T) {
 
 		// User 4
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("real-elon-musk@tesla.tx"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Elon",
 				LastName:  "Musk",
@@ -422,7 +421,7 @@ func TestUserRepository_Search(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "real-elon",
 			},
@@ -430,14 +429,14 @@ func TestUserRepository_Search(t *testing.T) {
 
 		// User 5
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("arararasaka@corpo.neechan"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Saburo",
 				LastName:  "Arasaka",
@@ -446,7 +445,7 @@ func TestUserRepository_Search(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "i-dont-have-any-ideas-anymore-alt",
 			},
@@ -473,7 +472,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 3,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -490,7 +489,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -507,7 +506,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -532,7 +531,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 3,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -549,7 +548,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -566,7 +565,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -591,7 +590,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 3,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -608,7 +607,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -625,7 +624,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -649,7 +648,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 5,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("arararasaka@corpo.neechan"),
@@ -666,7 +665,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -683,7 +682,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("sarasaka@corpo.plaza"),
@@ -701,7 +700,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -718,7 +717,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -743,7 +742,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 1,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("arararasaka@corpo.neechan"),
@@ -768,7 +767,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 3,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -785,7 +784,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -802,7 +801,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -833,7 +832,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 3,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -850,7 +849,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("jeff.musk@amazon.com"),
@@ -877,7 +876,7 @@ func TestUserRepository_Search(t *testing.T) {
 
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("real-elon-musk@tesla.tx"),
@@ -902,7 +901,7 @@ func TestUserRepository_Search(t *testing.T) {
 			expectCount: 2,
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("sarasaka@corpo.plaza"),
@@ -920,7 +919,7 @@ func TestUserRepository_Search(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("arararasaka@corpo.neechan"),
@@ -940,7 +939,7 @@ func TestUserRepository_Search(t *testing.T) {
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				res, count, err := dao.NewUserRepository(tx).Search(ctx, d.query, d.limit, d.offset)
@@ -955,21 +954,21 @@ func TestUserRepository_Search(t *testing.T) {
 }
 
 func TestUserRepository_List(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []interface{}{
 		// User 1
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("elon.bezos@space-origin.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Elon",
 				LastName:  "Bezos",
@@ -978,7 +977,7 @@ func TestUserRepository_List(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "space-origin",
 			},
@@ -986,14 +985,14 @@ func TestUserRepository_List(t *testing.T) {
 
 		// User 2
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("jeff.musk@amazon.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Jeff",
 				LastName:  "Bezos",
@@ -1002,7 +1001,7 @@ func TestUserRepository_List(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime.Add(time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "big-brother",
 			},
@@ -1010,14 +1009,14 @@ func TestUserRepository_List(t *testing.T) {
 
 		// User 3
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("sarasaka@corpo.plaza"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Saburo",
 				LastName:  "Arasaka",
@@ -1026,7 +1025,7 @@ func TestUserRepository_List(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug:     "i-dont-have-any-ideas-anymore",
 				Username: "Mikoshi",
@@ -1035,14 +1034,14 @@ func TestUserRepository_List(t *testing.T) {
 
 		// User 4
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("real-elon-musk@tesla.tx"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Elon",
 				LastName:  "Musk",
@@ -1051,7 +1050,7 @@ func TestUserRepository_List(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime.Add(30*time.Minute), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "real-elon",
 			},
@@ -1059,14 +1058,14 @@ func TestUserRepository_List(t *testing.T) {
 
 		// User 5
 		&dao.CredentialsModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("arararasaka@corpo.neechan"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		&dao.IdentityModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			IdentityModelCore: dao.IdentityModelCore{
 				FirstName: "Saburo",
 				LastName:  "Arasaka",
@@ -1075,7 +1074,7 @@ func TestUserRepository_List(t *testing.T) {
 			},
 		},
 		&dao.ProfileModel{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 			ProfileModelCore: dao.ProfileModelCore{
 				Slug: "i-dont-have-any-ideas-anymore-alt",
 			},
@@ -1092,15 +1091,15 @@ func TestUserRepository_List(t *testing.T) {
 		{
 			name: "Success",
 			ids: []uuid.UUID{
-				test.NumberUUID(1000),
-				test.NumberUUID(1002),
-				test.NumberUUID(1004),
+				goframework.NumberUUID(1000),
+				goframework.NumberUUID(1002),
+				goframework.NumberUUID(1004),
 				// Don't exist.
-				test.NumberUUID(15),
+				goframework.NumberUUID(15),
 			},
 			expect: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime.Add(4*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("elon.bezos@space-origin.com"),
@@ -1117,7 +1116,7 @@ func TestUserRepository_List(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime.Add(2*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("sarasaka@corpo.plaza"),
@@ -1135,7 +1134,7 @@ func TestUserRepository_List(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1004), baseTime.Add(6*time.Hour), &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: MustParseEmail("arararasaka@corpo.neechan"),
@@ -1157,13 +1156,13 @@ func TestUserRepository_List(t *testing.T) {
 			name: "Success/NoResults",
 			ids: []uuid.UUID{
 				// Don't exist.
-				test.NumberUUID(15),
+				goframework.NumberUUID(15),
 			},
 			expect: nil,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				res, err := dao.NewUserRepository(tx).List(ctx, d.ids)

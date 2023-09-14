@@ -2,7 +2,8 @@ package handlers
 
 import (
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
+	"github.com/a-novel/go-apis"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,9 +25,9 @@ func (h *previewHandlerImpl) Handle(c *gin.Context) {
 
 	preview, err := h.service.Preview(c, slug)
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrNotFound, http.StatusNotFound},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{bunovel.ErrNotFound, http.StatusNotFound},
+		}, false)
 		return
 	}
 

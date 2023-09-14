@@ -4,9 +4,8 @@ import (
 	"context"
 	"github.com/a-novel/auth-service/migrations"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/uptrace/bun"
@@ -16,13 +15,13 @@ import (
 )
 
 func TestCredentialsRepository_GetCredentials(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -40,17 +39,17 @@ func TestCredentialsRepository_GetCredentials(t *testing.T) {
 	}{
 		{
 			name:   "Success",
-			id:     test.NumberUUID(1000),
+			id:     goframework.NumberUUID(1000),
 			expect: fixtures[0],
 		},
 		{
 			name:      "Error/NotFound",
-			id:        test.NumberUUID(1),
-			expectErr: errors.ErrNotFound,
+			id:        goframework.NumberUUID(1),
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		repository := dao.NewCredentialsRepository(tx)
 
 		for _, d := range data {
@@ -65,13 +64,13 @@ func TestCredentialsRepository_GetCredentials(t *testing.T) {
 }
 
 func TestCredentialsRepository_GetCredentialsByEmail(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -95,11 +94,11 @@ func TestCredentialsRepository_GetCredentialsByEmail(t *testing.T) {
 		{
 			name:      "Error/NotFound",
 			email:     MustParseEmail("fake-user@domain.com"),
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		repository := dao.NewCredentialsRepository(tx)
 
 		for _, d := range data {
@@ -114,13 +113,13 @@ func TestCredentialsRepository_GetCredentialsByEmail(t *testing.T) {
 }
 
 func TestCredentialsRepository_EmailExists(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -148,7 +147,7 @@ func TestCredentialsRepository_EmailExists(t *testing.T) {
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		repository := dao.NewCredentialsRepository(tx)
 
 		for _, d := range data {
@@ -163,27 +162,27 @@ func TestCredentialsRepository_EmailExists(t *testing.T) {
 }
 
 func TestCredentialsRepository_UpdateEmail(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user3@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-other-user3@domain.com", "other-validation-code"),
@@ -207,10 +206,10 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:  "Success",
 			email: MustParseEmailWithValidation("new-user1@domain.com", "this-code-should-be-ignored"),
 			code:  "validation-code",
-			id:    test.NumberUUID(1000),
+			id:    goframework.NumberUUID(1000),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-user1@domain.com", "validation-code"),
@@ -222,10 +221,10 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:  "Success/WithValidationOnMainEmail",
 			email: MustParseEmailWithValidation("new-user2@domain.com", "this-code-should-be-ignored"),
 			code:  "validation-code",
-			id:    test.NumberUUID(1001),
+			id:    goframework.NumberUUID(1001),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 					NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -237,10 +236,10 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:  "Success/WithPreviousNewEmail",
 			email: MustParseEmailWithValidation("new-user3@domain.com", "this-code-should-be-ignored"),
 			code:  "validation-code",
-			id:    test.NumberUUID(1002),
+			id:    goframework.NumberUUID(1002),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user3@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-user3@domain.com", "validation-code"),
@@ -252,10 +251,10 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:  "Success/WhenAnotherAccountHasTheSameEmailPendingValidation",
 			email: MustParseEmailWithValidation("new-other-user3@domain.com", "this-code-should-be-ignored"),
 			code:  "validation-code",
-			id:    test.NumberUUID(1000),
+			id:    goframework.NumberUUID(1000),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-other-user3@domain.com", "validation-code"),
@@ -269,10 +268,10 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:  "Success/TakenByAnotherAccount",
 			email: MustParseEmail("user2@domain.com"),
 			code:  "validation-code",
-			id:    test.NumberUUID(1000),
+			id:    goframework.NumberUUID(1000),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					NewEmail: MustParseEmailWithValidation("user2@domain.com", "validation-code"),
@@ -284,16 +283,16 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 			name:      "Error/NotFound",
 			email:     MustParseEmailWithValidation("new-user1@domain.com", "this-code-should-be-ignored"),
 			code:      "validation-code",
-			id:        test.NumberUUID(100),
+			id:        goframework.NumberUUID(100),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/WithoutValidationCode",
 			email:     MustParseEmailWithValidation("new-user1@domain.com", "this-code-should-be-ignored"),
-			id:        test.NumberUUID(1000),
+			id:        goframework.NumberUUID(1000),
 			now:       updateTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 		{
 			name: "Error/WithoutUser",
@@ -301,9 +300,9 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 				Domain: "domain.com",
 			},
 			code:      "validation-code",
-			id:        test.NumberUUID(1000),
+			id:        goframework.NumberUUID(1000),
 			now:       updateTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 		{
 			name: "Error/WithoutDomain",
@@ -311,13 +310,13 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 				User: "new-user1",
 			},
 			code:      "validation-code",
-			id:        test.NumberUUID(1000),
+			id:        goframework.NumberUUID(1000),
 			now:       updateTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -334,20 +333,20 @@ func TestCredentialsRepository_UpdateEmail(t *testing.T) {
 }
 
 func TestCredentialsRepository_ValidateEmail(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user1@domain.com", "initial-validation-code"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -355,7 +354,7 @@ func TestCredentialsRepository_ValidateEmail(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user3@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -374,10 +373,10 @@ func TestCredentialsRepository_ValidateEmail(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			id:   test.NumberUUID(1000),
+			id:   goframework.NumberUUID(1000),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -386,10 +385,10 @@ func TestCredentialsRepository_ValidateEmail(t *testing.T) {
 		},
 		{
 			name: "Success/WithEmailPendingValidation",
-			id:   test.NumberUUID(1001),
+			id:   goframework.NumberUUID(1001),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user2@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -399,19 +398,19 @@ func TestCredentialsRepository_ValidateEmail(t *testing.T) {
 		},
 		{
 			name:      "Error/NoPendingValidation",
-			id:        test.NumberUUID(1002),
+			id:        goframework.NumberUUID(1002),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/NotFound",
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -428,13 +427,13 @@ func TestCredentialsRepository_ValidateEmail(t *testing.T) {
 }
 
 func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-user1@domain.com", "validation-code"),
@@ -442,7 +441,7 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -450,14 +449,14 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user3@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1003), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1003), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user4@domain.com"),
 				NewEmail: MustParseEmailWithValidation("user1@domain.com", "validation-code"),
@@ -477,10 +476,10 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			id:   test.NumberUUID(1000),
+			id:   goframework.NumberUUID(1000),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("new-user1@domain.com"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -489,10 +488,10 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 		},
 		{
 			name: "Success/WithMainEmailPendingValidation",
-			id:   test.NumberUUID(1001),
+			id:   goframework.NumberUUID(1001),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("new-user2@domain.com"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -501,25 +500,25 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 		},
 		{
 			name:      "Error/NoPendingValidation",
-			id:        test.NumberUUID(1002),
+			id:        goframework.NumberUUID(1002),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/NotFound",
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/AlreadyTaken",
-			id:        test.NumberUUID(1003),
+			id:        goframework.NumberUUID(1003),
 			now:       updateTime,
-			expectErr: errors.ErrUniqConstraintViolation,
+			expectErr: bunovel.ErrUniqConstraintViolation,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -536,20 +535,20 @@ func TestCredentialsRepository_ValidateNewEmail(t *testing.T) {
 }
 
 func TestCredentialsRepository_UpdatePassword(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user2@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed", Validation: "validation-code"},
@@ -570,10 +569,10 @@ func TestCredentialsRepository_UpdatePassword(t *testing.T) {
 		{
 			name:        "Success",
 			newPassword: "new-password-hashed",
-			id:          test.NumberUUID(1000),
+			id:          goframework.NumberUUID(1000),
 			now:         updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					Password: dao.Password{Hashed: "new-password-hashed"},
@@ -583,10 +582,10 @@ func TestCredentialsRepository_UpdatePassword(t *testing.T) {
 		{
 			name:        "Success/WithPendingReset",
 			newPassword: "new-password-hashed",
-			id:          test.NumberUUID(1001),
+			id:          goframework.NumberUUID(1001),
 			now:         updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user2@domain.com"),
 					Password: dao.Password{Hashed: "new-password-hashed"},
@@ -596,13 +595,13 @@ func TestCredentialsRepository_UpdatePassword(t *testing.T) {
 		{
 			name:        "Error/NotFound",
 			newPassword: "new-password-hashed",
-			id:          test.NumberUUID(100),
+			id:          goframework.NumberUUID(100),
 			now:         updateTime,
-			expectErr:   errors.ErrNotFound,
+			expectErr:   bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -619,20 +618,20 @@ func TestCredentialsRepository_UpdatePassword(t *testing.T) {
 }
 
 func TestCredentialsRepository_ResetPassword(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user2@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -657,7 +656,7 @@ func TestCredentialsRepository_ResetPassword(t *testing.T) {
 			email: MustParseEmail("user1@domain.com"),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					Password: dao.Password{Hashed: "password-hashed", Validation: "validation-code"},
@@ -670,7 +669,7 @@ func TestCredentialsRepository_ResetPassword(t *testing.T) {
 			email: MustParseEmail("user2@domain.com"),
 			now:   updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user2@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -683,18 +682,18 @@ func TestCredentialsRepository_ResetPassword(t *testing.T) {
 			code:      "validation-code",
 			email:     MustParseEmail("user3@domain.com"),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/NotFoundIfEmailPendingUpdate",
 			code:      "validation-code",
 			email:     MustParseEmail("new-user2@domain.com"),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -711,20 +710,20 @@ func TestCredentialsRepository_ResetPassword(t *testing.T) {
 }
 
 func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user1@domain.com", "old-validation-code"),
 				Password: dao.Password{Hashed: "password-hashed"},
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "old-validation-code"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -732,7 +731,7 @@ func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user3@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-user3@domain.com", "validation-code"),
@@ -754,10 +753,10 @@ func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
 		{
 			name: "Success",
 			code: "validation-code",
-			id:   test.NumberUUID(1000),
+			id:   goframework.NumberUUID(1000),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user1@domain.com", "validation-code"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -767,10 +766,10 @@ func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
 		{
 			name: "Success/WithAnEmailPendingUpdate",
 			code: "validation-code",
-			id:   test.NumberUUID(1001),
+			id:   goframework.NumberUUID(1001),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user2@domain.com", "validation-code"),
 					NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -781,20 +780,20 @@ func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
 		{
 			name:      "Error/NotFound",
 			code:      "validation-code",
-			id:        test.NumberUUID(100),
+			id:        goframework.NumberUUID(100),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/AlreadyValidated",
 			code:      "validation-code",
-			id:        test.NumberUUID(1002),
+			id:        goframework.NumberUUID(1002),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -811,13 +810,13 @@ func TestCredentialsRepository_UpdateEmailValidation(t *testing.T) {
 }
 
 func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-user1@domain.com", "old-validation-code"),
@@ -825,7 +824,7 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "old-validation-code"),
@@ -833,7 +832,7 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user3@domain.com", "initial-validation-code"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -853,17 +852,17 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 	}{
 		{
 			name:      "Error/NoValidationCode",
-			id:        test.NumberUUID(1000),
+			id:        goframework.NumberUUID(1000),
 			now:       updateTime,
-			expectErr: errors.ErrConstraintViolation,
+			expectErr: bunovel.ErrConstraintViolation,
 		},
 		{
 			name: "Success",
 			code: "validation-code",
-			id:   test.NumberUUID(1000),
+			id:   goframework.NumberUUID(1000),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					NewEmail: MustParseEmailWithValidation("new-user1@domain.com", "validation-code"),
@@ -874,10 +873,10 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 		{
 			name: "Success/WithMainEmailPendingValidation",
 			code: "validation-code",
-			id:   test.NumberUUID(1001),
+			id:   goframework.NumberUUID(1001),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 					NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "validation-code"),
@@ -888,20 +887,20 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 		{
 			name:      "Error/NotFound",
 			code:      "validation-code",
-			id:        test.NumberUUID(100),
+			id:        goframework.NumberUUID(100),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 		{
 			name:      "Error/NoPendingUpdate",
 			code:      "validation-code",
-			id:        test.NumberUUID(1002),
+			id:        goframework.NumberUUID(1002),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)
@@ -918,13 +917,13 @@ func TestCredentialsRepository_UpdateNewEmailValidation(t *testing.T) {
 }
 
 func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
-	db, sqlDB := test.GetPostgres(t, []fs.FS{migrations.Migrations})
+	db, sqlDB := bunovel.GetTestPostgres(t, []fs.FS{migrations.Migrations})
 	defer db.Close()
 	defer sqlDB.Close()
 
 	fixtures := []*dao.CredentialsModel{
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmail("user1@domain.com"),
 				NewEmail: MustParseEmailWithValidation("new-user1@domain.com", "old-validation-code"),
@@ -932,7 +931,7 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 				NewEmail: MustParseEmailWithValidation("new-user2@domain.com", "old-validation-code"),
@@ -940,7 +939,7 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 			},
 		},
 		{
-			Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &baseTime),
+			Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &baseTime),
 			CredentialsModelCore: dao.CredentialsModelCore{
 				Email:    MustParseEmailWithValidation("user3@domain.com", "initial-validation-code"),
 				Password: dao.Password{Hashed: "password-hashed"},
@@ -959,10 +958,10 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			id:   test.NumberUUID(1000),
+			id:   goframework.NumberUUID(1000),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1000), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmail("user1@domain.com"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -971,10 +970,10 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 		},
 		{
 			name: "Success/WithMainEmailPendingValidation",
-			id:   test.NumberUUID(1001),
+			id:   goframework.NumberUUID(1001),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1001), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1001), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user2@domain.com", "initial-validation-code"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -983,10 +982,10 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 		},
 		{
 			name: "Success/NoPendingUpdate",
-			id:   test.NumberUUID(1002),
+			id:   goframework.NumberUUID(1002),
 			now:  updateTime,
 			expect: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1002), baseTime, &updateTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1002), baseTime, &updateTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    MustParseEmailWithValidation("user3@domain.com", "initial-validation-code"),
 					Password: dao.Password{Hashed: "password-hashed"},
@@ -995,13 +994,13 @@ func TestCredentialsRepository_CancelNewEmail(t *testing.T) {
 		},
 		{
 			name:      "Error/NotFound",
-			id:        test.NumberUUID(100),
+			id:        goframework.NumberUUID(100),
 			now:       updateTime,
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
+	err := bunovel.RunTransactionalTest(db, fixtures, func(ctx context.Context, tx bun.Tx) {
 		for _, d := range data {
 			t.Run(d.name, func(st *testing.T) {
 				stx, err := tx.BeginTx(ctx, nil)

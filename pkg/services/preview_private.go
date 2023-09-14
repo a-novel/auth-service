@@ -5,7 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"time"
 )
 
@@ -42,7 +42,7 @@ func (s *previewPrivateServiceImpl) Preview(ctx context.Context, tokenRaw string
 		return nil, goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return nil, goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return nil, goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
 	credentials, err := s.credentialsDAO.GetCredentials(ctx, token.Token.Payload.ID)

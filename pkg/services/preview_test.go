@@ -6,8 +6,8 @@ import (
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -35,14 +35,14 @@ func TestPreview(t *testing.T) {
 			slug:                 "slug",
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Slug: "slug",
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -62,7 +62,7 @@ func TestPreview(t *testing.T) {
 			slug:                 "slug",
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Username: "username",
 					Slug:     "slug",
@@ -70,7 +70,7 @@ func TestPreview(t *testing.T) {
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -89,7 +89,7 @@ func TestPreview(t *testing.T) {
 			slug:                 "slug",
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Slug: "slug",
 				},

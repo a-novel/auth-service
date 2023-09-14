@@ -3,7 +3,9 @@ package handlers
 import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -30,11 +32,11 @@ func (h *loginHandlerImpl) Handle(c *gin.Context) {
 
 	token, err := h.service.Login(c, request.Email, request.Password, time.Now())
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidCredentials, http.StatusForbidden},
-			{errors.ErrNotFound, http.StatusNotFound},
-			{errors.ErrInvalidEntity, http.StatusUnprocessableEntity},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidCredentials, http.StatusForbidden},
+			{bunovel.ErrNotFound, http.StatusNotFound},
+			{goframework.ErrInvalidEntity, http.StatusUnprocessableEntity},
+		}, false)
 		return
 	}
 

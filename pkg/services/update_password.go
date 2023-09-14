@@ -5,9 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/security"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -27,11 +25,11 @@ type updatePasswordServiceImpl struct {
 }
 
 func (s *updatePasswordServiceImpl) UpdatePassword(ctx context.Context, form models.UpdatePasswordForm, now time.Time) error {
-	if err := validation.CheckMinMax(form.NewPassword, MinPasswordLength, MaxPasswordLength); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidPassword, err)
+	if err := goframework.CheckMinMax(form.NewPassword, MinPasswordLength, MaxPasswordLength); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidPassword, err)
 	}
 	if form.Code == "" && form.OldPassword == "" {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrMissingPasswordValidation)
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrMissingPasswordValidation)
 	}
 
 	credentials, err := s.credentialsDAO.GetCredentials(ctx, form.ID)
@@ -41,21 +39,21 @@ func (s *updatePasswordServiceImpl) UpdatePassword(ctx context.Context, form mod
 
 	if form.Code != "" {
 		if credentials.Password.Validation == "" {
-			return goerrors.Join(errors.ErrInvalidCredentials, ErrMissingPendingValidation)
+			return goerrors.Join(goframework.ErrInvalidCredentials, ErrMissingPendingValidation)
 		}
 
-		ok, err := security.VerifyCode(form.Code, credentials.Password.Validation)
+		ok, err := goframework.VerifyCode(form.Code, credentials.Password.Validation)
 		if err != nil {
 			return goerrors.Join(ErrVerifyValidationCode, err)
 		}
 		if !ok {
-			return goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidValidationCode)
+			return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidValidationCode)
 		}
 	} else {
 		err = bcrypt.CompareHashAndPassword([]byte(credentials.Password.Hashed), []byte(form.OldPassword))
 		if err != nil {
 			if err == bcrypt.ErrMismatchedHashAndPassword {
-				return goerrors.Join(errors.ErrInvalidCredentials, ErrWrongPassword)
+				return goerrors.Join(goframework.ErrInvalidCredentials, ErrWrongPassword)
 			}
 
 			return goerrors.Join(ErrCheckPassword, err)

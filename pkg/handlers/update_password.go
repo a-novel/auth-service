@@ -3,7 +3,9 @@ package handlers
 import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -31,11 +33,11 @@ func (h *updatePasswordHandlerImpl) Handle(c *gin.Context) {
 	}
 
 	if err := h.service.UpdatePassword(c, *request, time.Now()); err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidCredentials, http.StatusForbidden},
-			{errors.ErrInvalidEntity, http.StatusUnprocessableEntity},
-			{errors.ErrNotFound, http.StatusForbidden},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidCredentials, http.StatusForbidden},
+			{goframework.ErrInvalidEntity, http.StatusUnprocessableEntity},
+			{bunovel.ErrNotFound, http.StatusForbidden},
+		}, false)
 		return
 	}
 

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -27,10 +29,10 @@ func (h *resetPasswordHandlerImpl) Handle(c *gin.Context) {
 
 	deferred, err := h.service.ResetPassword(c, email, time.Now())
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidEntity, http.StatusBadRequest},
-			{errors.ErrNotFound, http.StatusNotFound},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidEntity, http.StatusBadRequest},
+			{bunovel.ErrNotFound, http.StatusNotFound},
+		}, false)
 		return
 	}
 

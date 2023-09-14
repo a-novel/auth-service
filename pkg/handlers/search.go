@@ -3,7 +3,8 @@ package handlers
 import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -31,9 +32,9 @@ func (s *searchHandlerImpl) Handle(c *gin.Context) {
 
 	users, total, err := s.service.Search(c, query.Query, query.Limit, query.Offset)
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidEntity, http.StatusBadRequest},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidEntity, http.StatusBadRequest},
+		}, false)
 		return
 	}
 

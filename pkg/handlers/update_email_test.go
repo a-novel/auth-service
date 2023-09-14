@@ -6,7 +6,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -48,7 +48,7 @@ func TestUpdateEmailHandler(t *testing.T) {
 			},
 			shouldCallService:          true,
 			shouldCallServiceWithEmail: "new-email",
-			serviceErr:                 errors.ErrInvalidCredentials,
+			serviceErr:                 goframework.ErrInvalidCredentials,
 			expectStatus:               http.StatusForbidden,
 		},
 		{
@@ -70,7 +70,7 @@ func TestUpdateEmailHandler(t *testing.T) {
 			},
 			shouldCallService:          true,
 			shouldCallServiceWithEmail: "new-email",
-			serviceErr:                 errors.ErrInvalidEntity,
+			serviceErr:                 goframework.ErrInvalidEntity,
 			expectStatus:               http.StatusUnprocessableEntity,
 		},
 	}

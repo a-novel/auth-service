@@ -2,8 +2,7 @@ package dao
 
 import (
 	"context"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
+	"github.com/a-novel/bunovel"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"time"
@@ -21,8 +20,7 @@ type UserRepository interface {
 
 type UserModel struct {
 	bun.BaseModel `bun:"table:users_view"`
-
-	postgresql.Metadata
+	bunovel.Metadata
 	UserModelCore
 }
 
@@ -45,19 +43,19 @@ func (repository *userRepositoryImpl) Create(ctx context.Context, data *UserMode
 
 	// Create all in a transaction, to avoid partially created users if any part of the operation fails.
 	err := repository.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		credentialsModel := &CredentialsModel{Metadata: postgresql.NewMetadata(id, now, nil), CredentialsModelCore: data.Credentials}
+		credentialsModel := &CredentialsModel{Metadata: bunovel.NewMetadata(id, now, nil), CredentialsModelCore: data.Credentials}
 		_, err := repository.db.NewInsert().Model(credentialsModel).Exec(ctx)
 		if err != nil {
 			return err
 		}
 
-		identityModel := &IdentityModel{Metadata: postgresql.NewMetadata(id, now, nil), IdentityModelCore: data.Identity}
+		identityModel := &IdentityModel{Metadata: bunovel.NewMetadata(id, now, nil), IdentityModelCore: data.Identity}
 		_, err = repository.db.NewInsert().Model(identityModel).Exec(ctx)
 		if err != nil {
 			return err
 		}
 
-		profileModel := &ProfileModel{Metadata: postgresql.NewMetadata(id, now, nil), ProfileModelCore: data.Profile}
+		profileModel := &ProfileModel{Metadata: bunovel.NewMetadata(id, now, nil), ProfileModelCore: data.Profile}
 		_, err = repository.db.NewInsert().Model(profileModel).Exec(ctx)
 		if err != nil {
 			return err
@@ -74,7 +72,7 @@ func (repository *userRepositoryImpl) Create(ctx context.Context, data *UserMode
 	})
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
@@ -98,7 +96,7 @@ LEFT JOIN LATERAL (
 		ScanAndCount(ctx, &results)
 
 	if err != nil {
-		return nil, 0, errors.HandlePGError(err)
+		return nil, 0, bunovel.HandlePGError(err)
 	}
 
 	return results, count, nil
@@ -109,7 +107,7 @@ func (repository *userRepositoryImpl) List(ctx context.Context, ids []uuid.UUID)
 
 	err := repository.db.NewSelect().Model(&results).Where("id IN (?)", bun.In(ids)).Scan(ctx)
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return results, nil

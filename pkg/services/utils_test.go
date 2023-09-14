@@ -4,7 +4,7 @@ import (
 	"crypto/ed25519"
 	"crypto/x509"
 	"fmt"
-	"github.com/a-novel/go-framework/security"
+	goframework "github.com/a-novel/go-framework"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -34,7 +34,7 @@ func init() {
 
 	passwordEncrypted = string(passwordEncryptedBytes)
 
-	publicValidationCode, privateValidationCode, err = security.GenerateCode()
+	publicValidationCode, privateValidationCode, err = goframework.GenerateCode()
 	if err != nil {
 		panic(err)
 	}

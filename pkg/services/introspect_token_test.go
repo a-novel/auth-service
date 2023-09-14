@@ -5,7 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -43,9 +43,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expect: &models.UserTokenStatus{
@@ -54,9 +54,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 		},
@@ -72,9 +72,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expect: &models.UserTokenStatus{
@@ -83,9 +83,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 		},
@@ -101,9 +101,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallGenerateToken: true,
@@ -113,9 +113,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(15 * time.Hour),
 						EXP: baseTime.Add(75 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expect: &models.UserTokenStatus{
@@ -124,9 +124,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(15 * time.Hour),
 						EXP: baseTime.Add(75 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 		},
@@ -142,9 +142,9 @@ func TestIntrospectToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime.Add(-time.Hour),
 						EXP: baseTime.Add(30 * time.Minute),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallGenerateToken: true,

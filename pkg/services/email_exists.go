@@ -4,7 +4,7 @@ import (
 	"context"
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 )
 
 type EmailExistsService interface {
@@ -26,7 +26,7 @@ type emailExistsServiceImpl struct {
 func (s *emailExistsServiceImpl) EmailExists(ctx context.Context, email string) (bool, error) {
 	daoEmail, err := dao.ParseEmail(email)
 	if err != nil {
-		return false, goerrors.Join(errors.ErrInvalidEntity, err)
+		return false, goerrors.Join(goframework.ErrInvalidEntity, err)
 	}
 
 	ok, err := s.credentialsDAO.EmailExists(ctx, daoEmail)

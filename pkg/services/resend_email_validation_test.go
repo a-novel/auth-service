@@ -7,10 +7,9 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -60,21 +59,21 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			publicValidationCode:     "public-validation-code",
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 				},
@@ -96,21 +95,21 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			publicValidationCode:     "public-validation-code",
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 				},
@@ -134,14 +133,14 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			publicValidationCode:     "public-validation-code",
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
@@ -159,7 +158,7 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			publicValidationCode:     "public-validation-code",
@@ -177,7 +176,7 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			generateValidationCodeErr: fooErr,
@@ -192,10 +191,10 @@ func TestResendEmailValidation(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: false,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name:                  "Error/IntrospectTokenFailure",
@@ -212,7 +211,7 @@ func TestResendEmailValidation(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			credentialsDAO := daomocks.NewCredentialsRepository(t)
 			identityDAO := daomocks.NewIdentityRepository(t)
-			mailerService := mailer.NewMockMailer(t)
+			mailerService := sendgridproxy.NewMockMailer(t)
 			introspectTokenService := servicesmocks.NewIntrospectTokenService(t)
 
 			generateLink := func() (string, string, error) {
@@ -237,7 +236,7 @@ func TestResendEmailValidation(t *testing.T) {
 
 			if d.shouldCallMailer {
 				mailerService.
-					On("Send", d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
+					On("Send", context.Background(), d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
 					Return(d.mailerErr)
 			}
 

@@ -5,8 +5,8 @@ import (
 	"crypto/ed25519"
 	"crypto/x509"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -21,7 +21,7 @@ func keyFromBytes(b []byte) ed25519.PrivateKey {
 	return key.(ed25519.PrivateKey)
 }
 
-var SecretKeysFixtures = []test.FileFixture{
+var SecretKeysFixtures = []goframework.FileFixture{
 	{
 		Name: "foo-test-1",
 		Content: []byte(`-----BEGIN PRIVATE KEY-----
@@ -99,7 +99,7 @@ func TestFileRepository_Write(t *testing.T) {
 		},
 	}
 
-	err := test.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
+	err := goframework.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
 		repository := dao.NewFileSystemSecretKeysRepository(basePath, "foo")
 
 		for _, d := range data {
@@ -139,11 +139,11 @@ func TestFileRepository_Read(t *testing.T) {
 		{
 			name:      "Error/NotExists",
 			keyName:   "test-4",
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
+	err := goframework.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
 		repository := dao.NewFileSystemSecretKeysRepository(basePath, "foo")
 
 		for _, d := range data {
@@ -197,7 +197,7 @@ func TestFileRepository_List(t *testing.T) {
 		},
 	}
 
-	err := test.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
+	err := goframework.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
 		for _, d := range data {
 			repository := dao.NewFileSystemSecretKeysRepository(basePath, d.prefix)
 			t.Run(d.name, func(t *testing.T) {
@@ -234,11 +234,11 @@ func TestFileRepository_Delete(t *testing.T) {
 		{
 			name:      "Error/NotExists",
 			keyName:   "test-4",
-			expectErr: errors.ErrNotFound,
+			expectErr: bunovel.ErrNotFound,
 		},
 	}
 
-	err := test.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
+	err := goframework.RunFileTransactionalTest(t, SecretKeysFixtures, func(ctx context.Context, basePath string) {
 		repository := dao.NewFileSystemSecretKeysRepository(basePath, "foo")
 
 		for _, d := range data {

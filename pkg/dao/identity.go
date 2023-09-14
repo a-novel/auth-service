@@ -3,8 +3,7 @@ package dao
 import (
 	"context"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
+	"github.com/a-novel/bunovel"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"time"
@@ -19,8 +18,7 @@ type IdentityRepository interface {
 
 type IdentityModel struct {
 	bun.BaseModel `bun:"table:identities"`
-
-	postgresql.Metadata
+	bunovel.Metadata
 	IdentityModelCore
 }
 
@@ -40,17 +38,17 @@ type identityRepositoryImpl struct {
 }
 
 func (repository *identityRepositoryImpl) GetIdentity(ctx context.Context, id uuid.UUID) (*IdentityModel, error) {
-	model := &IdentityModel{Metadata: postgresql.NewMetadata(id, time.Time{}, nil)}
+	model := &IdentityModel{Metadata: bunovel.NewMetadata(id, time.Time{}, nil)}
 
 	if err := repository.db.NewSelect().Model(model).WherePK().Scan(ctx); err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
 }
 
 func (repository *identityRepositoryImpl) Update(ctx context.Context, data *IdentityModelCore, id uuid.UUID, now time.Time) (*IdentityModel, error) {
-	model := &IdentityModel{Metadata: postgresql.NewMetadata(id, time.Time{}, &now), IdentityModelCore: *data}
+	model := &IdentityModel{Metadata: bunovel.NewMetadata(id, time.Time{}, &now), IdentityModelCore: *data}
 
 	res, err := repository.db.NewUpdate().Model(model).
 		WherePK().
@@ -59,10 +57,10 @@ func (repository *identityRepositoryImpl) Update(ctx context.Context, data *Iden
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err := errors.ForceRowsUpdate(res); err != nil {
+	if err := bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 

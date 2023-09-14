@@ -4,7 +4,7 @@ import (
 	"context"
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"time"
 )
 
@@ -33,7 +33,7 @@ func (s *cancelNewEmailServiceImpl) CancelNewEmail(ctx context.Context, tokenRaw
 		return goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
 	_, err = s.credentialsDAO.CancelNewEmail(ctx, token.Token.Payload.ID, now)

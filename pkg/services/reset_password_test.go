@@ -5,10 +5,9 @@ import (
 	"github.com/a-novel/auth-service/pkg/dao"
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -62,14 +61,14 @@ func TestResetPassword(t *testing.T) {
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 				},
@@ -94,14 +93,14 @@ func TestResetPassword(t *testing.T) {
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 				},
@@ -128,7 +127,7 @@ func TestResetPassword(t *testing.T) {
 			privateValidationCode:    "private-validation-code",
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
@@ -168,7 +167,7 @@ func TestResetPassword(t *testing.T) {
 			now:                   baseTime,
 			passwordResetLink:     "password-reset-link",
 			passwordResetTemplate: "password-reset-template",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 	}
 
@@ -176,7 +175,7 @@ func TestResetPassword(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			credentialsDAO := daomocks.NewCredentialsRepository(t)
 			identityDAO := daomocks.NewIdentityRepository(t)
-			mailerService := mailer.NewMockMailer(t)
+			mailerService := sendgridproxy.NewMockMailer(t)
 
 			generateLink := func() (string, string, error) {
 				return d.publicValidationCode, d.privateValidationCode, d.generateValidationCodeErr
@@ -196,7 +195,7 @@ func TestResetPassword(t *testing.T) {
 
 			if d.shouldCallMailer {
 				mailerService.
-					On("Send", d.shouldCallMailerWithEmail, d.updatePasswordTemplate, d.shouldCallMailerWithData).
+					On("Send", context.Background(), d.shouldCallMailerWithEmail, d.updatePasswordTemplate, d.shouldCallMailerWithData).
 					Return(d.mailerErr)
 			}
 

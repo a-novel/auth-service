@@ -7,9 +7,8 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -65,7 +64,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -97,7 +96,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -131,7 +130,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -153,7 +152,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -174,7 +173,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists:     true,
@@ -192,7 +191,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -209,7 +208,7 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallEmailExists: true,
@@ -226,10 +225,10 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:                  "Error/NoEmail",
@@ -240,10 +239,10 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:                  "Error/InvalidToken",
@@ -255,10 +254,10 @@ func TestUpdateEmail(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: false,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name:                  "Error/IntrospectTokenFailure",
@@ -276,7 +275,7 @@ func TestUpdateEmail(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			credentialsDAO := daomocks.NewCredentialsRepository(t)
 			identityDAO := daomocks.NewIdentityRepository(t)
-			mailerService := mailer.NewMockMailer(t)
+			mailerService := sendgridproxy.NewMockMailer(t)
 			introspectTokenService := servicesmocks.NewIntrospectTokenService(t)
 
 			generateLink := func() (string, string, error) {
@@ -307,7 +306,7 @@ func TestUpdateEmail(t *testing.T) {
 
 			if d.shouldCallMailer {
 				mailerService.
-					On("Send", d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
+					On("Send", context.Background(), d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
 					Return(d.mailerErr)
 			}
 

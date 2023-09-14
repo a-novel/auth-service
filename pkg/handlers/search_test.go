@@ -6,7 +6,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -81,7 +81,7 @@ func TestSearchHandler(t *testing.T) {
 			limit:             10,
 			offset:            20,
 			shouldCallService: true,
-			serviceErr:        errors.ErrInvalidEntity,
+			serviceErr:        goframework.ErrInvalidEntity,
 			expectStatus:      http.StatusBadRequest,
 		},
 	}

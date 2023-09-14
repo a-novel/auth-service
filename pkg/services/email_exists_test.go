@@ -5,7 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/dao"
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -61,7 +61,7 @@ func TestEmailExists(t *testing.T) {
 		{
 			name:      "Error/BadEmailFormat",
 			email:     "userdomain.com",
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 	}
 

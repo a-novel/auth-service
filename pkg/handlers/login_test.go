@@ -6,8 +6,8 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -48,9 +48,9 @@ func TestLoginHandler(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: "Bearer my-token",
 			},
@@ -74,7 +74,7 @@ func TestLoginHandler(t *testing.T) {
 			shouldCallService:             true,
 			shouldCallServiceWithEmail:    "email",
 			shouldCallServiceWithPassword: "password",
-			serviceErr:                    errors.ErrInvalidCredentials,
+			serviceErr:                    goframework.ErrInvalidCredentials,
 			expectStatus:                  http.StatusForbidden,
 		},
 		{
@@ -86,7 +86,7 @@ func TestLoginHandler(t *testing.T) {
 			shouldCallService:             true,
 			shouldCallServiceWithEmail:    "email",
 			shouldCallServiceWithPassword: "password",
-			serviceErr:                    errors.ErrNotFound,
+			serviceErr:                    bunovel.ErrNotFound,
 			expectStatus:                  http.StatusNotFound,
 		},
 		{
@@ -98,7 +98,7 @@ func TestLoginHandler(t *testing.T) {
 			shouldCallService:             true,
 			shouldCallServiceWithEmail:    "email",
 			shouldCallServiceWithPassword: "password",
-			serviceErr:                    errors.ErrInvalidEntity,
+			serviceErr:                    goframework.ErrInvalidEntity,
 			expectStatus:                  http.StatusUnprocessableEntity,
 		},
 	}

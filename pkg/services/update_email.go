@@ -5,8 +5,8 @@ import (
 	goerrors "errors"
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"time"
 )
@@ -18,7 +18,7 @@ type UpdateEmailService interface {
 func NewUpdateEmailService(
 	credentialsDAO dao.CredentialsRepository,
 	identityDAO dao.IdentityRepository,
-	mailer mailer.Mailer,
+	mailer sendgridproxy.Mailer,
 	generateValidationLink func() (string, string, error),
 	introspectTokenService IntrospectTokenService,
 	validateNewEmailLink string,
@@ -38,7 +38,7 @@ func NewUpdateEmailService(
 type updateEmailServiceImpl struct {
 	credentialsDAO         dao.CredentialsRepository
 	identityDAO            dao.IdentityRepository
-	mailer                 mailer.Mailer
+	mailer                 sendgridproxy.Mailer
 	generateValidationLink func() (string, string, error)
 	IntrospectTokenService
 
@@ -52,12 +52,12 @@ func (s *updateEmailServiceImpl) UpdateEmail(ctx context.Context, tokenRaw, newE
 		return nil, goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return nil, goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return nil, goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
 	newDAOEmail, err := dao.ParseEmail(newEmail)
 	if err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
 
 	emailExists, err := s.credentialsDAO.EmailExists(ctx, newDAOEmail)
@@ -65,7 +65,7 @@ func (s *updateEmailServiceImpl) UpdateEmail(ctx context.Context, tokenRaw, newE
 		return nil, goerrors.Join(ErrEmailExists, err)
 	}
 	if emailExists {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, ErrTaken)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, ErrTaken)
 	}
 
 	publicValidationCode, privateValidationCode, err := s.generateValidationLink()
@@ -89,7 +89,7 @@ func (s *updateEmailServiceImpl) UpdateEmail(ctx context.Context, tokenRaw, newE
 			"validation_link": fmt.Sprintf("%s?id=%s&code=%s", s.validateNewEmailLink, token.Token.Payload.ID, publicValidationCode),
 		}
 
-		if err := s.mailer.Send(to, s.validateNewEmailTemplate, templateData); err != nil {
+		if err := s.mailer.Send(ctx, to, s.validateNewEmailTemplate, templateData); err != nil {
 			return goerrors.Join(ErrSendValidationEmail, err)
 		}
 

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"strings"
@@ -48,13 +48,13 @@ func (s *generateTokenServiceImpl) GenerateToken(ctx context.Context, data model
 
 	mrshHeader, err := json.Marshal(source.Header)
 	if err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidTokenHeader, err)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidTokenHeader, err)
 	}
 	header := base64.RawURLEncoding.EncodeToString(mrshHeader)
 
 	mrshPayload, err := json.Marshal(source.Payload)
 	if err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidTokenPayload, err)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidTokenPayload, err)
 	}
 	payload := base64.RawURLEncoding.EncodeToString(mrshPayload)
 
@@ -85,7 +85,7 @@ type getTokenStatusServiceImpl struct {
 func (s *getTokenStatusServiceImpl) splitToken(token string) (string, string, string, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return "", "", "", goerrors.Join(errors.ErrInvalidEntity, ErrInvalidToken)
+		return "", "", "", goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidToken)
 	}
 
 	header := parts[0]
@@ -98,17 +98,17 @@ func (s *getTokenStatusServiceImpl) splitToken(token string) (string, string, st
 func (s *getTokenStatusServiceImpl) decodeToken(header, payload, signature string) ([]byte, []byte, []byte, error) {
 	decodedSignature, err := base64.RawURLEncoding.DecodeString(signature)
 	if err != nil {
-		return nil, nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidTokenSignature, err)
+		return nil, nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidTokenSignature, err)
 	}
 
 	decodedHeader, err := base64.RawURLEncoding.DecodeString(header)
 	if err != nil {
-		return nil, nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidTokenHeader, err)
+		return nil, nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidTokenHeader, err)
 	}
 
 	decodedPayload, err := base64.RawURLEncoding.DecodeString(payload)
 	if err != nil {
-		return nil, nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidTokenPayload, err)
+		return nil, nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidTokenPayload, err)
 	}
 
 	return decodedHeader, decodedPayload, decodedSignature, nil
@@ -130,7 +130,7 @@ func (s *getTokenStatusServiceImpl) validateToken(ctx context.Context, header, p
 	})
 
 	if !ok {
-		return goerrors.Join(errors.ErrInvalidCredentials, ErrNoSignatureMatch)
+		return goerrors.Join(goframework.ErrInvalidCredentials, ErrNoSignatureMatch)
 	}
 
 	return nil
@@ -147,7 +147,7 @@ func (s *getTokenStatusServiceImpl) GetTokenStatus(ctx context.Context, token st
 
 	header, payload, signature, err := s.splitToken(token)
 	if err != nil {
-		if goerrors.Is(err, errors.ErrInvalidEntity) {
+		if goerrors.Is(err, goframework.ErrInvalidEntity) {
 			status.Malformed = true
 			return status, nil
 		}
@@ -157,7 +157,7 @@ func (s *getTokenStatusServiceImpl) GetTokenStatus(ctx context.Context, token st
 
 	decodedHeader, decodedPayload, decodedSignature, err := s.decodeToken(header, payload, signature)
 	if err != nil {
-		if goerrors.Is(err, errors.ErrInvalidEntity) {
+		if goerrors.Is(err, goframework.ErrInvalidEntity) {
 			status.Malformed = true
 			return status, nil
 		}
@@ -166,7 +166,7 @@ func (s *getTokenStatusServiceImpl) GetTokenStatus(ctx context.Context, token st
 	}
 
 	if err := s.validateToken(ctx, header, payload, decodedSignature); err != nil {
-		if goerrors.Is(err, errors.ErrInvalidCredentials) {
+		if goerrors.Is(err, goframework.ErrInvalidCredentials) {
 			status.Expired = true
 		} else {
 			return nil, goerrors.Join(ErrValidateToken, err)

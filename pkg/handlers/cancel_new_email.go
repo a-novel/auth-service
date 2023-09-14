@@ -2,7 +2,8 @@ package handlers
 
 import (
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -26,9 +27,9 @@ func (h *cancelNewEmailHandlerImpl) Handle(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if err := h.service.CancelNewEmail(c, token, time.Now()); err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidCredentials, http.StatusForbidden},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidCredentials, http.StatusForbidden},
+		}, false)
 		return
 	}
 

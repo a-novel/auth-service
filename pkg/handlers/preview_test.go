@@ -5,7 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -48,7 +48,7 @@ func TestPreviewHandler(t *testing.T) {
 		{
 			name:         "Error/NotFound",
 			slug:         "slug",
-			serviceErr:   errors.ErrNotFound,
+			serviceErr:   bunovel.ErrNotFound,
 			expectStatus: http.StatusNotFound,
 		},
 	}

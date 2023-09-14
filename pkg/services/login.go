@@ -5,8 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -30,17 +29,17 @@ type loginServiceImpl struct {
 }
 
 func (s *loginServiceImpl) Login(ctx context.Context, email string, password string, now time.Time) (*models.UserTokenStatus, error) {
-	if err := validation.CheckMinMax(email, MinEmailLength, MaxEmailLength); err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+	if err := goframework.CheckMinMax(email, MinEmailLength, MaxEmailLength); err != nil {
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
 
-	if err := validation.CheckMinMax(password, MinPasswordLength, MaxPasswordLength); err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidPassword, err)
+	if err := goframework.CheckMinMax(password, MinPasswordLength, MaxPasswordLength); err != nil {
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidPassword, err)
 	}
 
 	daoEmail, err := dao.ParseEmail(email)
 	if err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
 
 	user, err := s.credentialsDAO.GetCredentialsByEmail(ctx, daoEmail)
@@ -51,7 +50,7 @@ func (s *loginServiceImpl) Login(ctx context.Context, email string, password str
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password.Hashed), []byte(password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return nil, goerrors.Join(errors.ErrInvalidCredentials, ErrWrongPassword)
+			return nil, goerrors.Join(goframework.ErrInvalidCredentials, ErrWrongPassword)
 		}
 
 		return nil, goerrors.Join(ErrCheckPassword, err)

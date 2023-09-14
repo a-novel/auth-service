@@ -2,7 +2,8 @@ package handlers
 
 import (
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -25,9 +26,9 @@ func (h *previewPrivateHandlerImpl) Handle(c *gin.Context) {
 
 	preview, err := h.service.Preview(c, token, time.Now())
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidCredentials, http.StatusForbidden},
-		})
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidCredentials, http.StatusForbidden},
+		}, false)
 		return
 	}
 

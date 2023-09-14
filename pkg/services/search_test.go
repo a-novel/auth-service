@@ -6,9 +6,8 @@ import (
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -38,7 +37,7 @@ func TestSearch(t *testing.T) {
 			shouldCallUserDAO: true,
 			userDAO: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Identity: dao.IdentityModelCore{
 							FirstName: "name-1",
@@ -50,7 +49,7 @@ func TestSearch(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(2), baseTime, &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(2), baseTime, &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Identity: dao.IdentityModelCore{
 							FirstName: "name-2",
@@ -103,13 +102,13 @@ func TestSearch(t *testing.T) {
 			query:     "query",
 			limit:     services.MaxUserSearchLimit + 1,
 			offset:    30,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:      "Error/NoLimit",
 			query:     "query",
 			offset:    30,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 	}
 
