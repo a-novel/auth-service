@@ -4,8 +4,7 @@ import (
 	"context"
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/security"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"time"
 )
@@ -34,14 +33,14 @@ func (s *validateNewEmailServiceImpl) ValidateNewEmail(ctx context.Context, id u
 
 	// Email already validated.
 	if credentials.NewEmail.Validation == "" {
-		return errors.ErrInvalidCredentials
+		return goframework.ErrInvalidCredentials
 	}
-	ok, err := security.VerifyCode(code, credentials.NewEmail.Validation)
+	ok, err := goframework.VerifyCode(code, credentials.NewEmail.Validation)
 	if err != nil {
 		return goerrors.Join(ErrVerifyValidationCode, err)
 	}
 	if !ok {
-		return goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidValidationCode)
+		return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidValidationCode)
 	}
 
 	_, err = s.credentialsDAO.ValidateNewEmail(ctx, id, now)

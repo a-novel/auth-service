@@ -5,8 +5,8 @@ import (
 	goerrors "errors"
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"time"
 )
@@ -18,7 +18,7 @@ type ResetPasswordService interface {
 func NewResetPasswordService(
 	credentialsDAO dao.CredentialsRepository,
 	identityDAO dao.IdentityRepository,
-	mailer mailer.Mailer,
+	mailer sendgridproxy.Mailer,
 	generateValidationLink func() (string, string, error),
 	passwordResetLink string,
 	passwordResetTemplate string,
@@ -36,7 +36,7 @@ func NewResetPasswordService(
 type resetPasswordServiceImpl struct {
 	credentialsDAO         dao.CredentialsRepository
 	identityDAO            dao.IdentityRepository
-	mailer                 mailer.Mailer
+	mailer                 sendgridproxy.Mailer
 	generateValidationLink func() (string, string, error)
 
 	passwordResetLink     string
@@ -46,7 +46,7 @@ type resetPasswordServiceImpl struct {
 func (s *resetPasswordServiceImpl) ResetPassword(ctx context.Context, email string, now time.Time) (func() error, error) {
 	daoEmail, err := dao.ParseEmail(email)
 	if err != nil {
-		return nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+		return nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
 
 	publicValidationCode, privateValidationCode, err := s.generateValidationLink()
@@ -71,7 +71,7 @@ func (s *resetPasswordServiceImpl) ResetPassword(ctx context.Context, email stri
 			"validation_link": fmt.Sprintf("%s?id=%s&code=%s", s.passwordResetLink, credentials.ID, publicValidationCode),
 		}
 
-		if err := s.mailer.Send(to, s.passwordResetTemplate, templateData); err != nil {
+		if err := s.mailer.Send(ctx, to, s.passwordResetTemplate, templateData); err != nil {
 			return goerrors.Join(ErrSendValidationEmail, err)
 		}
 

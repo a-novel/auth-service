@@ -7,7 +7,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -57,7 +57,7 @@ func TestUpdateProfileHandler(t *testing.T) {
 				Username: "username",
 				Slug:     "slug",
 			},
-			serviceErr:   errors.ErrInvalidCredentials,
+			serviceErr:   goframework.ErrInvalidCredentials,
 			expectStatus: http.StatusForbidden,
 		},
 		{
@@ -87,7 +87,7 @@ func TestUpdateProfileHandler(t *testing.T) {
 				Username: "username",
 				Slug:     "slug",
 			},
-			serviceErr:   errors.ErrInvalidEntity,
+			serviceErr:   goframework.ErrInvalidEntity,
 			expectStatus: http.StatusUnprocessableEntity,
 		},
 	}

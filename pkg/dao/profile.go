@@ -2,8 +2,7 @@ package dao
 
 import (
 	"context"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
+	"github.com/a-novel/bunovel"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"time"
@@ -23,8 +22,7 @@ type ProfileRepository interface {
 
 type ProfileModel struct {
 	bun.BaseModel `bun:"table:profiles"`
-
-	postgresql.Metadata
+	bunovel.Metadata
 	ProfileModelCore
 }
 
@@ -44,10 +42,10 @@ type profileRepositoryImpl struct {
 }
 
 func (repository *profileRepositoryImpl) GetProfile(ctx context.Context, id uuid.UUID) (*ProfileModel, error) {
-	model := &ProfileModel{Metadata: postgresql.NewMetadata(id, time.Time{}, nil)}
+	model := &ProfileModel{Metadata: bunovel.NewMetadata(id, time.Time{}, nil)}
 
 	if err := repository.db.NewSelect().Model(model).WherePK().Scan(ctx); err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
@@ -57,7 +55,7 @@ func (repository *profileRepositoryImpl) GetProfileBySlug(ctx context.Context, s
 	model := new(ProfileModel)
 
 	if err := repository.db.NewSelect().Model(model).Where("slug = ?", slug).Scan(ctx); err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
@@ -65,11 +63,11 @@ func (repository *profileRepositoryImpl) GetProfileBySlug(ctx context.Context, s
 
 func (repository *profileRepositoryImpl) SlugExists(ctx context.Context, slug string) (bool, error) {
 	ok, err := repository.db.NewSelect().Model(new(ProfileModel)).Where("slug = ?", slug).Exists(ctx)
-	return ok, errors.HandlePGError(err)
+	return ok, bunovel.HandlePGError(err)
 }
 
 func (repository *profileRepositoryImpl) Update(ctx context.Context, data *ProfileModelCore, id uuid.UUID, now time.Time) (*ProfileModel, error) {
-	model := &ProfileModel{Metadata: postgresql.NewMetadata(id, time.Time{}, &now), ProfileModelCore: *data}
+	model := &ProfileModel{Metadata: bunovel.NewMetadata(id, time.Time{}, &now), ProfileModelCore: *data}
 
 	res, err := repository.db.NewUpdate().Model(model).
 		WherePK().
@@ -82,10 +80,10 @@ func (repository *profileRepositoryImpl) Update(ctx context.Context, data *Profi
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err := errors.ForceRowsUpdate(res); err != nil {
+	if err := bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 

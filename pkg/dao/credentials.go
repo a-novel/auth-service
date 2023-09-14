@@ -2,8 +2,7 @@ package dao
 
 import (
 	"context"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
+	"github.com/a-novel/bunovel"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"time"
@@ -53,8 +52,7 @@ type CredentialsRepository interface {
 
 type CredentialsModel struct {
 	bun.BaseModel `bun:"table:credentials"`
-
-	postgresql.Metadata
+	bunovel.Metadata
 	CredentialsModelCore
 }
 
@@ -79,10 +77,10 @@ type credentialsRepositoryImpl struct {
 }
 
 func (repository *credentialsRepositoryImpl) GetCredentials(ctx context.Context, id uuid.UUID) (*CredentialsModel, error) {
-	model := &CredentialsModel{Metadata: postgresql.NewMetadata(id, time.Time{}, nil)}
+	model := &CredentialsModel{Metadata: bunovel.NewMetadata(id, time.Time{}, nil)}
 
 	if err := repository.db.NewSelect().Model(model).WherePK().Scan(ctx); err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
@@ -92,7 +90,7 @@ func (repository *credentialsRepositoryImpl) GetCredentialsByEmail(ctx context.C
 	model := new(CredentialsModel)
 
 	if err := repository.db.NewSelect().Model(model).Where(WhereEmail("email", email)).Scan(ctx); err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
 	return model, nil
@@ -100,12 +98,12 @@ func (repository *credentialsRepositoryImpl) GetCredentialsByEmail(ctx context.C
 
 func (repository *credentialsRepositoryImpl) EmailExists(ctx context.Context, email Email) (bool, error) {
 	ok, err := repository.db.NewSelect().Model(new(CredentialsModel)).Where(WhereEmail("email", email)).Exists(ctx)
-	return ok, errors.HandlePGError(err)
+	return ok, bunovel.HandlePGError(err)
 }
 
 func (repository *credentialsRepositoryImpl) UpdateEmail(ctx context.Context, email Email, code string, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
 	model := &CredentialsModel{
-		Metadata: postgresql.NewMetadata(id, time.Time{}, &now),
+		Metadata: bunovel.NewMetadata(id, time.Time{}, &now),
 		// Set new email with the given validation code. The main email remains unchanged until this email is
 		// validated.
 		CredentialsModelCore: CredentialsModelCore{
@@ -120,10 +118,10 @@ func (repository *credentialsRepositoryImpl) UpdateEmail(ctx context.Context, em
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -131,20 +129,20 @@ func (repository *credentialsRepositoryImpl) UpdateEmail(ctx context.Context, em
 }
 
 func (repository *credentialsRepositoryImpl) ValidateEmail(ctx context.Context, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
-	model := &CredentialsModel{Metadata: postgresql.NewMetadata(id, time.Time{}, &now)}
+	model := &CredentialsModel{Metadata: bunovel.NewMetadata(id, time.Time{}, &now)}
 	res, err := repository.db.NewUpdate().Model(model).
 		WherePK().
-		// User must have a pending email validation.
+		// User must have a pending email.
 		Where("email_validation_code != ''").
 		Column("email_validation_code", "updated_at").
 		Returning("*").
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -152,7 +150,7 @@ func (repository *credentialsRepositoryImpl) ValidateEmail(ctx context.Context, 
 }
 
 func (repository *credentialsRepositoryImpl) ValidateNewEmail(ctx context.Context, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
-	model := &CredentialsModel{Metadata: postgresql.NewMetadata(id, time.Time{}, nil)}
+	model := &CredentialsModel{Metadata: bunovel.NewMetadata(id, time.Time{}, nil)}
 
 	res, err := repository.db.NewUpdate().Model(model).
 		WherePK().
@@ -171,10 +169,10 @@ func (repository *credentialsRepositoryImpl) ValidateNewEmail(ctx context.Contex
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -183,7 +181,7 @@ func (repository *credentialsRepositoryImpl) ValidateNewEmail(ctx context.Contex
 
 func (repository *credentialsRepositoryImpl) UpdatePassword(ctx context.Context, newPassword string, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
 	model := &CredentialsModel{
-		Metadata: postgresql.NewMetadata(id, time.Time{}, &now),
+		Metadata: bunovel.NewMetadata(id, time.Time{}, &now),
 		CredentialsModelCore: CredentialsModelCore{
 			Password: Password{Hashed: newPassword},
 		},
@@ -198,10 +196,10 @@ func (repository *credentialsRepositoryImpl) UpdatePassword(ctx context.Context,
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -210,7 +208,7 @@ func (repository *credentialsRepositoryImpl) UpdatePassword(ctx context.Context,
 
 func (repository *credentialsRepositoryImpl) ResetPassword(ctx context.Context, code string, email Email, now time.Time) (*CredentialsModel, error) {
 	model := &CredentialsModel{
-		Metadata: postgresql.NewMetadata(uuid.Nil, time.Time{}, &now),
+		Metadata: bunovel.NewMetadata(uuid.Nil, time.Time{}, &now),
 		CredentialsModelCore: CredentialsModelCore{
 			Password: Password{Validation: code},
 		},
@@ -223,10 +221,10 @@ func (repository *credentialsRepositoryImpl) ResetPassword(ctx context.Context, 
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -235,7 +233,7 @@ func (repository *credentialsRepositoryImpl) ResetPassword(ctx context.Context, 
 
 func (repository *credentialsRepositoryImpl) UpdateEmailValidation(ctx context.Context, code string, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
 	model := &CredentialsModel{
-		Metadata: postgresql.NewMetadata(id, time.Time{}, &now),
+		Metadata: bunovel.NewMetadata(id, time.Time{}, &now),
 		CredentialsModelCore: CredentialsModelCore{
 			Email: Email{Validation: code},
 		},
@@ -250,10 +248,10 @@ func (repository *credentialsRepositoryImpl) UpdateEmailValidation(ctx context.C
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -262,7 +260,7 @@ func (repository *credentialsRepositoryImpl) UpdateEmailValidation(ctx context.C
 
 func (repository *credentialsRepositoryImpl) UpdateNewEmailValidation(ctx context.Context, code string, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
 	model := &CredentialsModel{
-		Metadata: postgresql.NewMetadata(id, time.Time{}, &now),
+		Metadata: bunovel.NewMetadata(id, time.Time{}, &now),
 		CredentialsModelCore: CredentialsModelCore{
 			NewEmail: Email{Validation: code},
 		},
@@ -277,10 +275,10 @@ func (repository *credentialsRepositoryImpl) UpdateNewEmailValidation(ctx contex
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 
@@ -288,7 +286,7 @@ func (repository *credentialsRepositoryImpl) UpdateNewEmailValidation(ctx contex
 }
 
 func (repository *credentialsRepositoryImpl) CancelNewEmail(ctx context.Context, id uuid.UUID, now time.Time) (*CredentialsModel, error) {
-	model := &CredentialsModel{Metadata: postgresql.NewMetadata(id, time.Time{}, &now)}
+	model := &CredentialsModel{Metadata: bunovel.NewMetadata(id, time.Time{}, &now)}
 	res, err := repository.db.NewUpdate().Model(model).
 		WherePK().
 		Column("new_email_user", "new_email_domain", "new_email_validation_code", "updated_at").
@@ -296,10 +294,10 @@ func (repository *credentialsRepositoryImpl) CancelNewEmail(ctx context.Context,
 		Exec(ctx)
 
 	if err != nil {
-		return nil, errors.HandlePGError(err)
+		return nil, bunovel.HandlePGError(err)
 	}
 
-	if err = errors.ForceRowsUpdate(res); err != nil {
+	if err = bunovel.ForceRowsUpdate(res); err != nil {
 		return nil, err
 	}
 

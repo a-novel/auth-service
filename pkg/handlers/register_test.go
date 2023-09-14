@@ -7,8 +7,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -61,9 +60,9 @@ func TestRegisterHandler(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: "Bearer my-token",
 			},
@@ -133,7 +132,7 @@ func TestRegisterHandler(t *testing.T) {
 				Slug:      "slug",
 				Username:  "username",
 			},
-			serviceErr:   errors.ErrInvalidEntity,
+			serviceErr:   goframework.ErrInvalidEntity,
 			expectStatus: http.StatusUnprocessableEntity,
 		},
 	}

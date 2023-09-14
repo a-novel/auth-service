@@ -5,8 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/dao"
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -31,7 +30,7 @@ func TestValidateEmail(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			id:   test.NumberUUID(1),
+			id:   goframework.NumberUUID(1),
 			code: publicValidationCode,
 			now:  baseTime,
 			dao: &dao.CredentialsModel{
@@ -43,7 +42,7 @@ func TestValidateEmail(t *testing.T) {
 		},
 		{
 			name: "Error/NoPendingValidation",
-			id:   test.NumberUUID(1),
+			id:   goframework.NumberUUID(1),
 			code: publicValidationCode,
 			now:  baseTime,
 			dao: &dao.CredentialsModel{
@@ -51,11 +50,11 @@ func TestValidateEmail(t *testing.T) {
 					Email: dao.Email{User: "user", Domain: "domain"},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name: "Error/WrongValidationCode",
-			id:   test.NumberUUID(1),
+			id:   goframework.NumberUUID(1),
 			code: "fakecode",
 			now:  baseTime,
 			dao: &dao.CredentialsModel{
@@ -63,11 +62,11 @@ func TestValidateEmail(t *testing.T) {
 					Email: dao.Email{User: "user", Domain: "domain", Validation: privateValidationCode},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name: "Error/UpdateFailure",
-			id:   test.NumberUUID(1),
+			id:   goframework.NumberUUID(1),
 			code: publicValidationCode,
 			now:  baseTime,
 			dao: &dao.CredentialsModel{
@@ -81,7 +80,7 @@ func TestValidateEmail(t *testing.T) {
 		},
 		{
 			name:      "Error/GetCredentialsFailure",
-			id:        test.NumberUUID(1),
+			id:        goframework.NumberUUID(1),
 			code:      publicValidationCode,
 			now:       baseTime,
 			daoErr:    fooErr,

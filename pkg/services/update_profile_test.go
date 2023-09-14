@@ -7,8 +7,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
@@ -45,7 +44,7 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallSlugExists: true,
@@ -63,7 +62,7 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallSlugExists: true,
@@ -81,10 +80,10 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:     "Error/UsernameTooLong",
@@ -97,10 +96,10 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:     "Error/InvalidSlug",
@@ -112,10 +111,10 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:     "Error/SlugTooLong",
@@ -127,10 +126,10 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:     "Error/NoSlug",
@@ -140,10 +139,10 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:     "Error/UpdateFailure",
@@ -155,7 +154,7 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallSlugExists: true,
@@ -174,7 +173,7 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallSlugExists: true,
@@ -191,7 +190,7 @@ func TestUpdateProfile(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallSlugExists: true,
@@ -207,10 +206,10 @@ func TestUpdateProfile(t *testing.T) {
 			},
 			introspectToken: &models.UserTokenStatus{
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name:     "Error/IntrospectTokenFailure",

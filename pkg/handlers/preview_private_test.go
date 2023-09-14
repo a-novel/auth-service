@@ -5,8 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -32,7 +31,7 @@ func TestPreviewPrivateHandler(t *testing.T) {
 			name:          "Success",
 			authorization: "Bearer token",
 			serviceResp: &models.UserPreviewPrivate{
-				ID:        test.NumberUUID(1),
+				ID:        goframework.NumberUUID(1),
 				Email:     "email",
 				NewEmail:  "new-email",
 				Validated: true,
@@ -45,7 +44,7 @@ func TestPreviewPrivateHandler(t *testing.T) {
 				},
 			},
 			expect: map[string]interface{}{
-				"id":        test.NumberUUID(1).String(),
+				"id":        goframework.NumberUUID(1).String(),
 				"email":     "email",
 				"newEmail":  "new-email",
 				"validated": true,
@@ -60,7 +59,7 @@ func TestPreviewPrivateHandler(t *testing.T) {
 		{
 			name:          "Error/Forbidden",
 			authorization: "Bearer token",
-			serviceErr:    errors.ErrInvalidCredentials,
+			serviceErr:    goframework.ErrInvalidCredentials,
 			expectStatus:  http.StatusForbidden,
 		},
 	}

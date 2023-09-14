@@ -5,8 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/samber/lo"
 )
 
@@ -29,8 +28,8 @@ type searchServiceImpl struct {
 }
 
 func (s *searchServiceImpl) Search(ctx context.Context, query string, limit int, offset int) ([]*models.UserPreview, int, error) {
-	if err := validation.CheckMinMax(limit, 1, MaxUserSearchLimit); err != nil {
-		return nil, 0, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSearchLimit, err)
+	if err := goframework.CheckMinMax(limit, 1, MaxUserSearchLimit); err != nil {
+		return nil, 0, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSearchLimit, err)
 	}
 
 	users, total, err := s.userDAO.Search(ctx, query, limit, offset)

@@ -3,7 +3,8 @@ package handlers
 import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -30,10 +31,10 @@ func (h *registerHandlerImpl) Handle(c *gin.Context) {
 
 	token, deferred, err := h.service.Register(c, *form, time.Now())
 	if err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
 			{services.ErrTaken, http.StatusConflict},
-			{errors.ErrInvalidEntity, http.StatusUnprocessableEntity},
-		})
+			{goframework.ErrInvalidEntity, http.StatusUnprocessableEntity},
+		}, false)
 		return
 	}
 

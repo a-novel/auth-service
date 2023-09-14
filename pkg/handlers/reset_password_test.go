@@ -3,7 +3,8 @@ package handlers_test
 import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -30,13 +31,13 @@ func TestResetPasswordHandler(t *testing.T) {
 		{
 			name:         "Error/ErrInvalidEntity",
 			email:        "email",
-			serviceErr:   errors.ErrInvalidEntity,
+			serviceErr:   goframework.ErrInvalidEntity,
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name:         "Error/NotFound",
 			email:        "email",
-			serviceErr:   errors.ErrNotFound,
+			serviceErr:   bunovel.ErrNotFound,
 			expectStatus: http.StatusNotFound,
 		},
 	}

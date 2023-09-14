@@ -7,10 +7,9 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -82,12 +81,12 @@ func TestRegister(t *testing.T) {
 			generateTokenStatus: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCreateUser: true,
 			createUser: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    dao.Email{User: "user", Domain: "domain.com", Validation: "private-validation-code"},
@@ -113,7 +112,7 @@ func TestRegister(t *testing.T) {
 			expect: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expectDeferred: true,
@@ -143,12 +142,12 @@ func TestRegister(t *testing.T) {
 			generateTokenStatus: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCreateUser: true,
 			createUser: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    dao.Email{User: "user", Domain: "domain.com", Validation: "private-validation-code"},
@@ -175,7 +174,7 @@ func TestRegister(t *testing.T) {
 			expect: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expectDeferred: true,
@@ -204,12 +203,12 @@ func TestRegister(t *testing.T) {
 			generateTokenStatus: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCreateUser: true,
 			createUser: &dao.UserModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				UserModelCore: dao.UserModelCore{
 					Credentials: dao.CredentialsModelCore{
 						Email:    dao.Email{User: "user", Domain: "domain.com", Validation: "private-validation-code"},
@@ -236,7 +235,7 @@ func TestRegister(t *testing.T) {
 			expect: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expectDeferred:    true,
@@ -266,7 +265,7 @@ func TestRegister(t *testing.T) {
 			generateTokenStatus: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCreateUser: true,
@@ -408,7 +407,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/UserNotBorn(Seriously)",
@@ -424,7 +423,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/UserTooOld",
@@ -440,7 +439,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/EmailInvalid",
@@ -456,7 +455,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/UsernameInvalid",
@@ -473,7 +472,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/UsernameTooLong",
@@ -490,7 +489,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/InvalidLastName",
@@ -507,7 +506,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/LastNameTooLong",
@@ -524,7 +523,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/InvalidFirstName",
@@ -541,7 +540,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/FirstNameTooLong",
@@ -558,7 +557,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/InvalidSlug",
@@ -575,7 +574,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/SlugTooLong",
@@ -592,7 +591,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/PasswordTooShort",
@@ -609,7 +608,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/PasswordTooLong",
@@ -626,7 +625,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/EmailTooLong",
@@ -643,7 +642,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/InvalidSex",
@@ -660,7 +659,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoEmail",
@@ -676,7 +675,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoPassword",
@@ -692,7 +691,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoFirstName",
@@ -708,7 +707,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoLastName",
@@ -724,7 +723,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoSlug",
@@ -740,7 +739,7 @@ func TestRegister(t *testing.T) {
 			now:                   baseTime,
 			validateEmailTemplate: "validate-email-template",
 			validateEmailLink:     "validate-email-link",
-			expectErr:             errors.ErrInvalidEntity,
+			expectErr:             goframework.ErrInvalidEntity,
 		},
 	}
 
@@ -749,7 +748,7 @@ func TestRegister(t *testing.T) {
 			credentialsDAO := daomocks.NewCredentialsRepository(t)
 			profileDAO := daomocks.NewProfileRepository(t)
 			userDAO := daomocks.NewUserRepository(t)
-			mailerService := mailer.NewMockMailer(t)
+			mailerService := sendgridproxy.NewMockMailer(t)
 			generateTokenService := servicesmocks.NewGenerateTokenService(t)
 
 			generateLink := func() (string, string, error) {
@@ -758,7 +757,7 @@ func TestRegister(t *testing.T) {
 
 			if d.shouldCallMailer {
 				mailerService.
-					On("Send", d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
+					On("Send", context.Background(), d.shouldCallMailerWithEmail, d.validateEmailTemplate, d.shouldCallMailerWithData).
 					Return(d.mailerErr)
 			}
 

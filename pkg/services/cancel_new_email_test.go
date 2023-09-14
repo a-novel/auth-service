@@ -6,8 +6,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -35,7 +34,7 @@ func TestCancelNewEmail(t *testing.T) {
 			introspectTokenResp: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: "string-token",
 			},
@@ -48,7 +47,7 @@ func TestCancelNewEmail(t *testing.T) {
 			introspectTokenResp: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: "string-token",
 			},
@@ -68,7 +67,7 @@ func TestCancelNewEmail(t *testing.T) {
 			tokenRaw:            "string-token",
 			now:                 baseTime,
 			introspectTokenResp: &models.UserTokenStatus{OK: false},
-			expectErr:           errors.ErrInvalidCredentials,
+			expectErr:           goframework.ErrInvalidCredentials,
 		},
 	}
 

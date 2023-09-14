@@ -6,8 +6,7 @@ import (
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
@@ -33,7 +32,7 @@ func TestUpdatePassword(t *testing.T) {
 		{
 			name: "Success",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				OldPassword: password,
 			},
@@ -49,7 +48,7 @@ func TestUpdatePassword(t *testing.T) {
 		{
 			name: "Success/ValidationCode",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				Code:        publicValidationCode,
 			},
@@ -65,7 +64,7 @@ func TestUpdatePassword(t *testing.T) {
 		{
 			name: "Error/UpdatePasswordFailure",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				OldPassword: password,
 			},
@@ -83,7 +82,7 @@ func TestUpdatePassword(t *testing.T) {
 		{
 			name: "Error/WrongPassword",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				OldPassword: "fake-password",
 			},
@@ -94,12 +93,12 @@ func TestUpdatePassword(t *testing.T) {
 					Password: dao.Password{Hashed: passwordEncrypted},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name: "Error/WrongValidationCode",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				Code:        "fakecode",
 			},
@@ -110,12 +109,12 @@ func TestUpdatePassword(t *testing.T) {
 					Password: dao.Password{Hashed: passwordEncrypted, Validation: privateValidationCode},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name: "Error/ValidationCodeExpired",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 				Code:        publicValidationCode,
 			},
@@ -126,45 +125,45 @@ func TestUpdatePassword(t *testing.T) {
 					Password: dao.Password{Hashed: passwordEncrypted},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name: "Error/NoNewPassword",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				OldPassword: password,
 			},
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NoIdentityConfirmation",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "new-secure-password",
 			},
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NewPasswordTooShort",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: "p",
 				OldPassword: password,
 			},
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name: "Error/NewPasswordTooLong",
 			form: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				NewPassword: strings.Repeat("a", services.MaxPasswordLength+1),
 				OldPassword: password,
 			},
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 	}
 

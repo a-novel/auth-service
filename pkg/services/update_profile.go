@@ -5,8 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
 	"time"
 )
 
@@ -32,22 +31,22 @@ func (s *updateProfileServiceImpl) UpdateProfile(ctx context.Context, tokenRaw s
 		return goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
-	if err := validation.CheckMinMax(form.Slug, 1, MaxSlugLength); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, err)
+	if err := goframework.CheckMinMax(form.Slug, 1, MaxSlugLength); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, err)
 	}
-	if err := validation.CheckMinMax(form.Username, -1, MaxUsernameLength); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidUsername, err)
+	if err := goframework.CheckMinMax(form.Username, -1, MaxUsernameLength); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidUsername, err)
 	}
 
-	if err := validation.CheckRegexp(form.Slug, slugRegexp); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, err)
+	if err := goframework.CheckRegexp(form.Slug, slugRegexp); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, err)
 	}
 	if form.Username != "" {
-		if err := validation.CheckRegexp(form.Username, usernameRegexp); err != nil {
-			return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidUsername, err)
+		if err := goframework.CheckRegexp(form.Username, usernameRegexp); err != nil {
+			return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidUsername, err)
 		}
 	}
 
@@ -56,7 +55,7 @@ func (s *updateProfileServiceImpl) UpdateProfile(ctx context.Context, tokenRaw s
 		return goerrors.Join(ErrSlugExists, err)
 	}
 	if slugExists {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, ErrTaken)
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, ErrTaken)
 	}
 
 	if _, err := s.profileDAO.Update(ctx, &dao.ProfileModelCore{

@@ -3,7 +3,8 @@ package handlers
 import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -33,11 +34,11 @@ func (h *updateProfileHandlerImpl) Handle(c *gin.Context) {
 	}
 
 	if err := h.service.UpdateProfile(c, token, time.Now(), *request); err != nil {
-		errors.ErrorToHTTPCode(c, err, []errors.HTTPError{
-			{errors.ErrInvalidCredentials, http.StatusForbidden},
+		apis.ErrorToHTTPCode(c, err, []apis.HTTPError{
+			{goframework.ErrInvalidCredentials, http.StatusForbidden},
 			{services.ErrTaken, http.StatusConflict},
-			{errors.ErrInvalidEntity, http.StatusUnprocessableEntity},
-		})
+			{goframework.ErrInvalidEntity, http.StatusUnprocessableEntity},
+		}, false)
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 	"crypto/ed25519"
 	goerrors "errors"
 	"fmt"
-	"github.com/a-novel/go-framework/errors"
+	"github.com/a-novel/bunovel"
 	"google.golang.org/api/iterator"
 	"io"
 	"os"
@@ -84,7 +84,7 @@ func (repository *fileSystemRepositoryImpl) Read(_ context.Context, name string)
 	fileReader, err := os.Open(repository.getPath(name))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.ErrNotFound
+			return nil, bunovel.ErrNotFound
 		}
 
 		return nil, fmt.Errorf("failed to open file %q: %w", repository.getPath(name), err)
@@ -146,7 +146,7 @@ func (repository *fileSystemRepositoryImpl) List(ctx context.Context) ([]*Secret
 func (repository *fileSystemRepositoryImpl) Delete(_ context.Context, name string) error {
 	if err := os.Remove(repository.getPath(name)); err != nil {
 		if goerrors.Is(err, os.ErrNotExist) {
-			return errors.ErrNotFound
+			return bunovel.ErrNotFound
 		}
 
 		return fmt.Errorf("failed to delete file %q: %w", name, err)
@@ -182,7 +182,7 @@ func (repository *googleDatastoreRepositoryImpl) Read(ctx context.Context, name 
 	fileReader, err := repository.bucket.Object(name).NewReader(ctx)
 	if err != nil {
 		if goerrors.Is(err, storage.ErrObjectNotExist) {
-			return nil, errors.ErrNotFound
+			return nil, bunovel.ErrNotFound
 		}
 
 		return nil, fmt.Errorf("failed to acquire reader for file %q: %w", name, err)
@@ -236,7 +236,7 @@ func (repository *googleDatastoreRepositoryImpl) List(ctx context.Context) ([]*S
 func (repository *googleDatastoreRepositoryImpl) Delete(ctx context.Context, name string) error {
 	if err := repository.bucket.Object(name).Delete(ctx); err != nil {
 		if goerrors.Is(err, storage.ErrObjectNotExist) {
-			return errors.ErrNotFound
+			return bunovel.ErrNotFound
 		}
 
 		return fmt.Errorf("failed to acquire reader for file %q: %w", name, err)

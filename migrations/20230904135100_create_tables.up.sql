@@ -103,7 +103,6 @@ CREATE VIEW users_view AS
 --bun:split
 
 CREATE UNIQUE INDEX credentials_email ON credentials (email_user, email_domain);
-
 CREATE UNIQUE INDEX profiles_slug ON profiles (slug);
 
 CREATE INDEX IF NOT EXISTS user_profile_username_search ON profiles USING gin (format_search(username) gin_trgm_ops);

@@ -7,9 +7,8 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -47,26 +46,26 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Slug: "slug",
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -75,7 +74,7 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        test.NumberUUID(1),
+				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: true,
 				UserPreview: models.UserPreview{
@@ -93,19 +92,19 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Username: "username",
 					Slug:     "slug",
@@ -113,7 +112,7 @@ func TestPreviewPrivate(t *testing.T) {
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -122,7 +121,7 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        test.NumberUUID(1),
+				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: true,
 				UserPreview: models.UserPreview{
@@ -141,12 +140,12 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    dao.Email{User: "user", Domain: "domain.com"},
 					NewEmail: dao.Email{User: "new-user", Domain: "domain.com"},
@@ -154,7 +153,7 @@ func TestPreviewPrivate(t *testing.T) {
 			},
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Username: "username",
 					Slug:     "slug",
@@ -162,7 +161,7 @@ func TestPreviewPrivate(t *testing.T) {
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -171,7 +170,7 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        test.NumberUUID(1),
+				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				NewEmail:  "new-user@domain.com",
 				Validated: true,
@@ -191,26 +190,26 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com", Validation: "validation-code"},
 				},
 			},
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Slug: "slug",
 				},
 			},
 			shouldCallIdentityDAO: true,
 			identityDAO: &dao.IdentityModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				IdentityModelCore: dao.IdentityModelCore{
 					FirstName: "name",
 					LastName:  "last-name",
@@ -219,7 +218,7 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        test.NumberUUID(1),
+				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: false,
 				UserPreview: models.UserPreview{
@@ -237,19 +236,19 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
 			},
 			shouldCallProfileDAO: true,
 			profileDAO: &dao.ProfileModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				ProfileModelCore: dao.ProfileModelCore{
 					Slug: "slug",
 				},
@@ -265,12 +264,12 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
 			credentialsDAO: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email: dao.Email{User: "user", Domain: "domain.com"},
 				},
@@ -286,7 +285,7 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			shouldCallCredentialsDAO: true,
@@ -300,10 +299,10 @@ func TestPreviewPrivate(t *testing.T) {
 			introspectToken: &models.UserTokenStatus{
 				OK: false,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name:               "Error/IntrospectTokenFailure",

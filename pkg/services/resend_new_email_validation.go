@@ -5,8 +5,8 @@ import (
 	goerrors "errors"
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/dao"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"time"
 )
@@ -18,7 +18,7 @@ type ResendNewEmailValidationService interface {
 func NewResendNewEmailValidationService(
 	credentialsDAO dao.CredentialsRepository,
 	identityDAO dao.IdentityRepository,
-	mailer mailer.Mailer,
+	mailer sendgridproxy.Mailer,
 	generateValidationLink func() (string, string, error),
 	introspectTokenService IntrospectTokenService,
 	validateNewEmailLink string,
@@ -38,7 +38,7 @@ func NewResendNewEmailValidationService(
 type resendNewEmailValidationServiceImpl struct {
 	credentialsDAO         dao.CredentialsRepository
 	identityDAO            dao.IdentityRepository
-	mailer                 mailer.Mailer
+	mailer                 sendgridproxy.Mailer
 	generateValidationLink func() (string, string, error)
 	IntrospectTokenService
 
@@ -52,7 +52,7 @@ func (s *resendNewEmailValidationServiceImpl) ResendNewEmailValidation(ctx conte
 		return nil, goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return nil, goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return nil, goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
 	publicValidationCode, privateValidationCode, err := s.generateValidationLink()
@@ -77,7 +77,7 @@ func (s *resendNewEmailValidationServiceImpl) ResendNewEmailValidation(ctx conte
 			"validation_link": fmt.Sprintf("%s?id=%s&code=%s", s.validateNewEmailLink, token.Token.Payload.ID, publicValidationCode),
 		}
 
-		if err := s.mailer.Send(to, s.validateNewEmailTemplate, templateData); err != nil {
+		if err := s.mailer.Send(ctx, to, s.validateNewEmailTemplate, templateData); err != nil {
 			return goerrors.Join(ErrSendValidationEmail, err)
 		}
 

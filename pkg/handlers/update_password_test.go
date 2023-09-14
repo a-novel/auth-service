@@ -6,8 +6,8 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -32,14 +32,14 @@ func TestUpdatePasswordHandler(t *testing.T) {
 		{
 			name: "Success",
 			body: map[string]interface{}{
-				"id":          test.NumberUUID(1).String(),
+				"id":          goframework.NumberUUID(1).String(),
 				"code":        "validation-code",
 				"oldPassword": "old-password",
 				"newPassword": "new-password",
 			},
 			shouldCallService: true,
 			shouldCallServiceWith: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				Code:        "validation-code",
 				OldPassword: "old-password",
 				NewPassword: "new-password",
@@ -49,55 +49,55 @@ func TestUpdatePasswordHandler(t *testing.T) {
 		{
 			name: "Error/ErrInvalidCredentials",
 			body: map[string]interface{}{
-				"id":          test.NumberUUID(1).String(),
+				"id":          goframework.NumberUUID(1).String(),
 				"code":        "validation-code",
 				"oldPassword": "old-password",
 				"newPassword": "new-password",
 			},
 			shouldCallService: true,
 			shouldCallServiceWith: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				Code:        "validation-code",
 				OldPassword: "old-password",
 				NewPassword: "new-password",
 			},
-			serviceErr:   errors.ErrInvalidCredentials,
+			serviceErr:   goframework.ErrInvalidCredentials,
 			expectStatus: http.StatusForbidden,
 		},
 		{
 			name: "Error/ErrInvalidEntity",
 			body: map[string]interface{}{
-				"id":          test.NumberUUID(1).String(),
+				"id":          goframework.NumberUUID(1).String(),
 				"code":        "validation-code",
 				"oldPassword": "old-password",
 				"newPassword": "new-password",
 			},
 			shouldCallService: true,
 			shouldCallServiceWith: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				Code:        "validation-code",
 				OldPassword: "old-password",
 				NewPassword: "new-password",
 			},
-			serviceErr:   errors.ErrInvalidEntity,
+			serviceErr:   goframework.ErrInvalidEntity,
 			expectStatus: http.StatusUnprocessableEntity,
 		},
 		{
 			name: "Error/ErrNotFound",
 			body: map[string]interface{}{
-				"id":          test.NumberUUID(1).String(),
+				"id":          goframework.NumberUUID(1).String(),
 				"code":        "validation-code",
 				"oldPassword": "old-password",
 				"newPassword": "new-password",
 			},
 			shouldCallService: true,
 			shouldCallServiceWith: models.UpdatePasswordForm{
-				ID:          test.NumberUUID(1),
+				ID:          goframework.NumberUUID(1),
 				Code:        "validation-code",
 				OldPassword: "old-password",
 				NewPassword: "new-password",
 			},
-			serviceErr:   errors.ErrNotFound,
+			serviceErr:   bunovel.ErrNotFound,
 			expectStatus: http.StatusForbidden,
 		},
 	}

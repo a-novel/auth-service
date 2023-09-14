@@ -5,7 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -33,7 +33,7 @@ func TestListHandler(t *testing.T) {
 			name:                  "Success",
 			query:                 "01010101-0101-0101-0101-010101010101,02020202-0202-0202-0202-020202020202",
 			shouldCallService:     true,
-			shouldCallServiceWith: []uuid.UUID{test.NumberUUID(1), test.NumberUUID(2)},
+			shouldCallServiceWith: []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			serviceResp: []*models.UserPreview{
 				{
 					Username:  "username 1",
@@ -79,7 +79,7 @@ func TestListHandler(t *testing.T) {
 			name:                  "Success/IgnoreInvalidIDs",
 			query:                 "fake-id,02020202-0202-0202-0202-020202020202",
 			shouldCallService:     true,
-			shouldCallServiceWith: []uuid.UUID{test.NumberUUID(2)},
+			shouldCallServiceWith: []uuid.UUID{goframework.NumberUUID(2)},
 			serviceResp: []*models.UserPreview{
 				{
 					FirstName: "first name 2",
@@ -105,7 +105,7 @@ func TestListHandler(t *testing.T) {
 			name:                  "Error/ServiceFailure",
 			query:                 "01010101-0101-0101-0101-010101010101,02020202-0202-0202-0202-020202020202",
 			shouldCallService:     true,
-			shouldCallServiceWith: []uuid.UUID{test.NumberUUID(1), test.NumberUUID(2)},
+			shouldCallServiceWith: []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			serviceErr:            fooErr,
 			expectStatus:          http.StatusInternalServerError,
 		},

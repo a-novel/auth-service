@@ -5,7 +5,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -39,9 +39,9 @@ func TestIntrospectTokenHandler(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: "Bearer my-token",
 			},
@@ -54,10 +54,10 @@ func TestIntrospectTokenHandler(t *testing.T) {
 					"header": map[string]interface{}{
 						"iat": baseTime.Format(time.RFC3339),
 						"exp": baseTime.Add(time.Hour).Format(time.RFC3339),
-						"id":  test.NumberUUID(10).String(),
+						"id":  goframework.NumberUUID(10).String(),
 					},
 					"payload": map[string]interface{}{
-						"id": test.NumberUUID(1).String(),
+						"id": goframework.NumberUUID(1).String(),
 					},
 				},
 				"tokenRaw": "Bearer my-token",

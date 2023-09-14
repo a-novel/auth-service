@@ -8,22 +8,7 @@ import (
 func GetLogger() zerolog.Logger {
 	logger := zerolog.New(os.Stdout).
 		With().
-		Dict(
-			"application", zerolog.Dict().
-				Str("name", App.Name).
-				Str("env", ENV).
-				Dict(
-					"cors", zerolog.Dict().
-						Strs("allowed_origins", App.Frontend.URLs).
-						Strs("allowed_methods", Cors.AllowMethods).
-						Strs("allowed_headers", Cors.AllowHeaders).
-						Strs("exposed_headers", Cors.ExposeHeaders).
-						Bool("allow_credentials", Cors.AllowCredentials).
-						Dur("max_age", Cors.MaxAge),
-				).
-				Str("host", API.Host).
-				Int("port", API.Port),
-		).
+		Dict("application", zerolog.Dict().Str("name", App.Name).Str("env", ENV)).
 		Dict(
 			"mailer", zerolog.Dict().
 				Str("sender_email", Mailer.Sender.Email).
@@ -45,13 +30,7 @@ func GetLogger() zerolog.Logger {
 func GetInternalLogger() zerolog.Logger {
 	logger := zerolog.New(os.Stdout).
 		With().
-		Dict(
-			"application", zerolog.Dict().
-				Str("name", App.Name+"-internal").
-				Str("env", ENV).
-				Str("host", API.HostInternal).
-				Int("port", API.PortInternal),
-		).
+		Dict("application", zerolog.Dict().Str("name", App.Name+"-internal").Str("env", ENV)).
 		Logger()
 
 	switch ENV {

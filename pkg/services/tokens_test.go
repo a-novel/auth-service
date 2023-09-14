@@ -6,7 +6,7 @@ import (
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -36,8 +36,8 @@ func TestGenerateToken(t *testing.T) {
 		{
 			name:     "Success",
 			tokenTTL: time.Hour,
-			data:     models.UserTokenPayload{ID: test.NumberUUID(1)},
-			id:       test.NumberUUID(10),
+			data:     models.UserTokenPayload{ID: goframework.NumberUUID(1)},
+			id:       goframework.NumberUUID(10),
 			now:      baseTime,
 			list: []*dao.SecretKeyModel{
 				{
@@ -55,9 +55,9 @@ func TestGenerateToken(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: TokenKey0,
 			},
@@ -65,8 +65,8 @@ func TestGenerateToken(t *testing.T) {
 		{
 			name:      "Error/DAOFailure",
 			tokenTTL:  time.Hour,
-			data:      models.UserTokenPayload{ID: test.NumberUUID(1)},
-			id:        test.NumberUUID(10),
+			data:      models.UserTokenPayload{ID: goframework.NumberUUID(1)},
+			id:        goframework.NumberUUID(10),
 			now:       baseTime,
 			listErr:   fooErr,
 			expectErr: fooErr,
@@ -74,8 +74,8 @@ func TestGenerateToken(t *testing.T) {
 		{
 			name:      "Error/NoSignatureKeys",
 			tokenTTL:  time.Hour,
-			data:      models.UserTokenPayload{ID: test.NumberUUID(1)},
-			id:        test.NumberUUID(10),
+			data:      models.UserTokenPayload{ID: goframework.NumberUUID(1)},
+			id:        goframework.NumberUUID(10),
 			now:       baseTime,
 			expectErr: services.ErrMissingSignatureKeys,
 		},
@@ -137,9 +137,9 @@ func TestTokenStatus(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: TokenKey0,
 			},
@@ -174,9 +174,9 @@ func TestTokenStatus(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: TokenKey0,
 			},
@@ -206,9 +206,9 @@ func TestTokenStatus(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: TokenKey0,
 			},
@@ -234,9 +234,9 @@ func TestTokenStatus(t *testing.T) {
 					Header: models.UserTokenHeader{
 						IAT: baseTime,
 						EXP: baseTime.Add(time.Hour),
-						ID:  test.NumberUUID(10),
+						ID:  goframework.NumberUUID(10),
 					},
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 				TokenRaw: TokenKey0,
 			},

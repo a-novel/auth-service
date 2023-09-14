@@ -7,9 +7,8 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"strings"
@@ -43,7 +42,7 @@ func TestLogin(t *testing.T) {
 			now:           baseTime,
 			shouldCallDAO: true,
 			daoResponse: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    dao.Email{User: "user", Domain: "domain.com"},
 					Password: dao.Password{Hashed: passwordEncrypted},
@@ -53,13 +52,13 @@ func TestLogin(t *testing.T) {
 			generateTokenStatus: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 			expect: &models.UserTokenStatus{
 				OK: true,
 				Token: &models.UserToken{
-					Payload: models.UserTokenPayload{ID: test.NumberUUID(1)},
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
 				},
 			},
 		},
@@ -70,7 +69,7 @@ func TestLogin(t *testing.T) {
 			now:           baseTime,
 			shouldCallDAO: true,
 			daoResponse: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    dao.Email{User: "user", Domain: "domain.com"},
 					Password: dao.Password{Hashed: passwordEncrypted},
@@ -87,13 +86,13 @@ func TestLogin(t *testing.T) {
 			now:           baseTime,
 			shouldCallDAO: true,
 			daoResponse: &dao.CredentialsModel{
-				Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &baseTime),
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
 				CredentialsModelCore: dao.CredentialsModelCore{
 					Email:    dao.Email{User: "user", Domain: "domain.com"},
 					Password: dao.Password{Hashed: passwordEncrypted},
 				},
 			},
-			expectErr: errors.ErrInvalidCredentials,
+			expectErr: goframework.ErrInvalidCredentials,
 		},
 		{
 			name:          "Error/CredentialsDAOFailure",
@@ -109,21 +108,21 @@ func TestLogin(t *testing.T) {
 			email:     "userdomain.com",
 			password:  password,
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:      "Error/EmailTooLong",
 			email:     strings.Repeat("a", services.MaxEmailLength) + "@domain.com",
 			password:  password,
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 		{
 			name:      "Error/PasswordTooLong",
 			email:     strings.Repeat("a", services.MaxPasswordLength) + "x",
 			password:  password,
 			now:       baseTime,
-			expectErr: errors.ErrInvalidEntity,
+			expectErr: goframework.ErrInvalidEntity,
 		},
 	}
 

@@ -6,8 +6,8 @@ import (
 	daomocks "github.com/a-novel/auth-service/pkg/dao/mocks"
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/postgresql"
-	"github.com/a-novel/go-framework/test"
+	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -28,10 +28,10 @@ func TestList(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			ids:  []uuid.UUID{test.NumberUUID(1), test.NumberUUID(2)},
+			ids:  []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			daoResponse: []*dao.UserModel{
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(1), baseTime, &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: dao.Email{User: "user1", Domain: "domain.com"},
@@ -49,7 +49,7 @@ func TestList(t *testing.T) {
 					},
 				},
 				{
-					Metadata: postgresql.NewMetadata(test.NumberUUID(2), baseTime, &updateTime),
+					Metadata: bunovel.NewMetadata(goframework.NumberUUID(2), baseTime, &updateTime),
 					UserModelCore: dao.UserModelCore{
 						Credentials: dao.CredentialsModelCore{
 							Email: dao.Email{User: "user2", Domain: "domain.com"},
@@ -82,13 +82,13 @@ func TestList(t *testing.T) {
 		},
 		{
 			name:        "Success/NoResults",
-			ids:         []uuid.UUID{test.NumberUUID(1), test.NumberUUID(2)},
+			ids:         []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			daoResponse: nil,
 			expect:      []*models.UserPreview{},
 		},
 		{
 			name:      "Error/DAOFailure",
-			ids:       []uuid.UUID{test.NumberUUID(1), test.NumberUUID(2)},
+			ids:       []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			daoErr:    fooErr,
 			expectErr: fooErr,
 		},

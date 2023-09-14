@@ -1,11 +1,11 @@
 package models
 
 import (
-	"github.com/a-novel/go-framework/types"
+	"github.com/a-novel/go-apis"
 )
 
 type ListQuery struct {
-	IDs types.StringUUIDs `json:"ids" form:"ids"`
+	IDs apis.StringUUIDs `json:"ids" form:"ids"`
 }
 
 type SearchQuery struct {
@@ -15,6 +15,6 @@ type SearchQuery struct {
 }
 
 type ValidateEmailQuery struct {
-	ID   types.StringUUID `json:"id" form:"id"`
-	Code string           `json:"code" form:"code"`
+	ID   apis.StringUUID `json:"id" form:"id"`
+	Code string          `json:"code" form:"code"`
 }

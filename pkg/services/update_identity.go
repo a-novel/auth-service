@@ -5,8 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
 	"time"
 )
 
@@ -32,29 +31,29 @@ func (s *updateIdentityServiceImpl) UpdateIdentity(ctx context.Context, tokenRaw
 		return goerrors.Join(ErrIntrospectToken, err)
 	}
 	if !token.OK {
-		return goerrors.Join(errors.ErrInvalidCredentials, ErrInvalidToken)
+		return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidToken)
 	}
 
-	if err := validation.CheckMinMax(form.FirstName, 1, MaxNameLength); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidFirstName, err)
+	if err := goframework.CheckMinMax(form.FirstName, 1, MaxNameLength); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidFirstName, err)
 	}
-	if err := validation.CheckMinMax(form.LastName, 1, MaxNameLength); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidLastName, err)
+	if err := goframework.CheckMinMax(form.LastName, 1, MaxNameLength); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidLastName, err)
 	}
 
-	if err := validation.CheckRestricted(form.Sex, models.SexMale, models.SexFemale); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSex, err)
+	if err := goframework.CheckRestricted(form.Sex, models.SexMale, models.SexFemale); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSex, err)
 	}
-	if err := validation.CheckRegexp(form.FirstName, nameRegexp); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidFirstName, err)
+	if err := goframework.CheckRegexp(form.FirstName, nameRegexp); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidFirstName, err)
 	}
-	if err := validation.CheckRegexp(form.LastName, nameRegexp); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidLastName, err)
+	if err := goframework.CheckRegexp(form.LastName, nameRegexp); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidLastName, err)
 	}
 
 	age := getUserAge(form.Birthday, now)
-	if err := validation.CheckMinMax(age, MinAge, MaxAge); err != nil {
-		return goerrors.Join(errors.ErrInvalidEntity, ErrInvalidAge, err)
+	if err := goframework.CheckMinMax(age, MinAge, MaxAge); err != nil {
+		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidAge, err)
 	}
 
 	if _, err := s.identityDAO.Update(ctx, &dao.IdentityModelCore{

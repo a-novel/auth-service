@@ -2,10 +2,6 @@ package config
 
 import (
 	_ "embed"
-	"github.com/a-novel/go-framework/middlewares"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"log"
 )
 
@@ -32,16 +28,4 @@ func init() {
 	}
 
 	API = cfg
-}
-
-func GetRouter(logger zerolog.Logger) *gin.Engine {
-	router := gin.New()
-	router.Use(gin.RecoveryWithWriter(logger), middlewares.Logger(logger, Deploy.ProjectID), cors.New(Cors))
-
-	if ENV == ProdENV {
-		gin.SetMode(gin.ReleaseMode)
-		router.TrustedPlatform = gin.PlatformGoogleAppEngine
-	}
-
-	return router
 }

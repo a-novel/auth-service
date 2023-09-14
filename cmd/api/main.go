@@ -1,14 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/a-novel/auth-service/config"
+	"github.com/a-novel/auth-service/migrations"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/handlers"
 	"github.com/a-novel/auth-service/pkg/services"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/security"
+	"github.com/a-novel/bunovel"
+	"github.com/a-novel/go-apis"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"io/fs"
 )
 
 func getFrontendURL(value string) string {
@@ -16,13 +21,24 @@ func getFrontendURL(value string) string {
 }
 
 func main() {
+	ctx := context.Background()
 	logger := config.GetLogger()
 
-	postgres, closer := config.GetPostgres(logger)
-	defer closer()
+	postgres, sql, err := bunovel.NewClient(ctx, bunovel.Config{
+		Driver:                &bunovel.PGDriver{DSN: config.Postgres.DSN, AppName: config.App.Name},
+		Migrations:            &bunovel.MigrateConfig{Files: []fs.FS{migrations.Migrations}},
+		DiscardUnknownColumns: true,
+	})
+	if err != nil {
+		logger.Fatal().Err(err).Msg("error connecting to postgres")
+	}
+	defer func() {
+		_ = postgres.Close()
+		_ = sql.Close()
+	}()
 
 	mailSender := mail.NewEmail(config.Mailer.Sender.Name, config.Mailer.Sender.Email)
-	mailClient := mailer.NewMailer(config.Mailer.APIKey, mailSender, config.Mailer.Sandbox, logger)
+	mailClient := sendgridproxy.NewMailer(config.Mailer.APIKey, mailSender, config.Mailer.Sandbox, logger)
 
 	secretKeysDAO, logger := config.GetSecretsRepository(logger)
 	credentialsDAO := dao.NewCredentialsRepository(postgres)
@@ -40,21 +56,19 @@ func main() {
 	loginService := services.NewLoginService(credentialsDAO, generateTokenService)
 	previewService := services.NewPreviewService(profileDAO, identityDAO)
 	previewPrivateService := services.NewPreviewPrivateService(credentialsDAO, profileDAO, identityDAO, introspectTokenService)
-	registerService := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailClient, security.GenerateCode, generateTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
-	resendEmailValidationService := services.NewResendEmailValidationService(credentialsDAO, identityDAO, mailClient, security.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
-	resendNewEmailValidationService := services.NewResendNewEmailValidationService(credentialsDAO, identityDAO, mailClient, security.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
-	resetPasswordService := services.NewResetPasswordService(credentialsDAO, identityDAO, mailClient, security.GenerateCode, config.Mailer.Templates.PasswordReset, getFrontendURL(config.App.Frontend.Routes.ResetPassword))
+	registerService := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailClient, goframework.GenerateCode, generateTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
+	resendEmailValidationService := services.NewResendEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
+	resendNewEmailValidationService := services.NewResendNewEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
+	resetPasswordService := services.NewResetPasswordService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, config.Mailer.Templates.PasswordReset, getFrontendURL(config.App.Frontend.Routes.ResetPassword))
 	searchService := services.NewSearchService(userDAO)
 	slugExistsService := services.NewSlugExistsService(profileDAO)
-	updateEmailService := services.NewUpdateEmailService(credentialsDAO, identityDAO, mailClient, security.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
+	updateEmailService := services.NewUpdateEmailService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
 	updateIdentityService := services.NewUpdateIdentityService(identityDAO, introspectTokenService)
 	updatePasswordService := services.NewUpdatePasswordService(credentialsDAO)
 	updateProfileService := services.NewUpdateProfileService(profileDAO, introspectTokenService)
 	validateEmailService := services.NewValidateEmailService(credentialsDAO)
 	validateNewEmailService := services.NewValidateNewEmailService(credentialsDAO)
 
-	pingHandler := handlers.NewPingHandler()
-	healthCheckHandler := handlers.NewHealthCheckHandler(postgres)
 	introspectTokenHandler := handlers.NewIntrospectTokenHandler(introspectTokenService)
 	cancelNewEmailHandler := handlers.NewCancelNewEmailHandler(cancelNewEmailService)
 	emailExistsHandler := handlers.NewEmailExistsHandler(emailExistsService)
@@ -75,10 +89,18 @@ func main() {
 	validateEmailHandler := handlers.NewValidateEmailHandler(validateEmailService)
 	validateNewEmailHandler := handlers.NewValidateNewEmailHandler(validateNewEmailService)
 
-	router := config.GetRouter(logger)
+	router := apis.GetRouter(apis.RouterConfig{
+		Logger:    logger,
+		ProjectID: config.Deploy.ProjectID,
+		CORS:      apis.GetCORS(config.App.Frontend.URLs),
+		Prod:      config.ENV == config.ProdENV,
+		Health: map[string]apis.HealthChecker{
+			"postgres": func() error {
+				return postgres.PingContext(context.Background())
+			},
+		},
+	})
 
-	router.GET("/ping", pingHandler.Handle)
-	router.GET("/healthcheck", healthCheckHandler.Handle)
 	router.GET("/auth", introspectTokenHandler.Handle)
 	router.POST("/auth", loginHandler.Handle)
 	router.PUT("/auth", registerHandler.Handle)

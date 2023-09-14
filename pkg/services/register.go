@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/mailer"
-	"github.com/a-novel/go-framework/validation"
+	goframework "github.com/a-novel/go-framework"
+	sendgridproxy "github.com/a-novel/sendgrid-proxy"
 	"github.com/google/uuid"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"golang.org/x/crypto/bcrypt"
@@ -24,7 +23,7 @@ func NewRegisterService(
 	credentialsDAO dao.CredentialsRepository,
 	profileDAO dao.ProfileRepository,
 	userDAO dao.UserRepository,
-	mailer mailer.Mailer,
+	mailer sendgridproxy.Mailer,
 	generateValidationCode func() (string, string, error),
 	generateTokenService GenerateTokenService,
 	validateEmailTemplate string,
@@ -46,7 +45,7 @@ type registerServiceImpl struct {
 	credentialsDAO         dao.CredentialsRepository
 	profileDAO             dao.ProfileRepository
 	userDAO                dao.UserRepository
-	mailer                 mailer.Mailer
+	mailer                 sendgridproxy.Mailer
 	generateValidationCode func() (string, string, error)
 	GenerateTokenService
 
@@ -55,51 +54,51 @@ type registerServiceImpl struct {
 }
 
 func (s *registerServiceImpl) Register(ctx context.Context, form models.RegisterForm, now time.Time) (*models.UserTokenStatus, func() error, error) {
-	if err := validation.CheckMinMax(form.Email, MinEmailLength, MaxEmailLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+	if err := goframework.CheckMinMax(form.Email, MinEmailLength, MaxEmailLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
-	if err := validation.CheckMinMax(form.Password, MinPasswordLength, MaxPasswordLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidPassword, err)
+	if err := goframework.CheckMinMax(form.Password, MinPasswordLength, MaxPasswordLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidPassword, err)
 	}
-	if err := validation.CheckMinMax(form.FirstName, 1, MaxNameLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidFirstName, err)
+	if err := goframework.CheckMinMax(form.FirstName, 1, MaxNameLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidFirstName, err)
 	}
-	if err := validation.CheckMinMax(form.LastName, 1, MaxNameLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidLastName, err)
+	if err := goframework.CheckMinMax(form.LastName, 1, MaxNameLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidLastName, err)
 	}
-	if err := validation.CheckMinMax(form.Slug, 1, MaxSlugLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, err)
+	if err := goframework.CheckMinMax(form.Slug, 1, MaxSlugLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, err)
 	}
-	if err := validation.CheckMinMax(form.Username, -1, MaxUsernameLength); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidUsername, err)
+	if err := goframework.CheckMinMax(form.Username, -1, MaxUsernameLength); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidUsername, err)
 	}
 
-	if err := validation.CheckRestricted(form.Sex, models.SexMale, models.SexFemale); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSex, err)
+	if err := goframework.CheckRestricted(form.Sex, models.SexMale, models.SexFemale); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSex, err)
 	}
-	if err := validation.CheckRegexp(form.Slug, slugRegexp); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, err)
+	if err := goframework.CheckRegexp(form.Slug, slugRegexp); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, err)
 	}
-	if err := validation.CheckRegexp(form.FirstName, nameRegexp); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidFirstName, err)
+	if err := goframework.CheckRegexp(form.FirstName, nameRegexp); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidFirstName, err)
 	}
-	if err := validation.CheckRegexp(form.LastName, nameRegexp); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidLastName, err)
+	if err := goframework.CheckRegexp(form.LastName, nameRegexp); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidLastName, err)
 	}
 	if form.Username != "" {
-		if err := validation.CheckRegexp(form.Username, usernameRegexp); err != nil {
-			return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidUsername, err)
+		if err := goframework.CheckRegexp(form.Username, usernameRegexp); err != nil {
+			return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidUsername, err)
 		}
 	}
 
 	daoEmail, err := dao.ParseEmail(form.Email)
 	if err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, err)
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, err)
 	}
 
 	age := getUserAge(form.Birthday, now)
-	if err := validation.CheckMinMax(age, MinAge, MaxAge); err != nil {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidAge, err)
+	if err := goframework.CheckMinMax(age, MinAge, MaxAge); err != nil {
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidAge, err)
 	}
 
 	emailExists, err := s.credentialsDAO.EmailExists(ctx, daoEmail)
@@ -107,7 +106,7 @@ func (s *registerServiceImpl) Register(ctx context.Context, form models.Register
 		return nil, nil, goerrors.Join(ErrEmailExists, err)
 	}
 	if emailExists {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidEmail, ErrTaken)
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidEmail, ErrTaken)
 	}
 
 	slugExists, err := s.profileDAO.SlugExists(ctx, form.Slug)
@@ -115,7 +114,7 @@ func (s *registerServiceImpl) Register(ctx context.Context, form models.Register
 		return nil, nil, goerrors.Join(ErrSlugExists, err)
 	}
 	if slugExists {
-		return nil, nil, goerrors.Join(errors.ErrInvalidEntity, ErrInvalidSlug, ErrTaken)
+		return nil, nil, goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, ErrTaken)
 	}
 
 	// Generate the code to validate user email. The private (hashed) code goes in the database. The public code will
@@ -165,7 +164,7 @@ func (s *registerServiceImpl) Register(ctx context.Context, form models.Register
 			"validation_link": fmt.Sprintf("%s?id=%s&code=%s", s.validateEmailLink, user.ID, publicValidationCode),
 		}
 
-		if err := s.mailer.Send(to, s.validateEmailTemplate, templateData); err != nil {
+		if err := s.mailer.Send(ctx, to, s.validateEmailTemplate, templateData); err != nil {
 			return goerrors.Join(ErrSendValidationEmail, err)
 		}
 

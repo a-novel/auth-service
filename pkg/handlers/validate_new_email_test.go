@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"github.com/a-novel/auth-service/pkg/handlers"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
-	"github.com/a-novel/go-framework/errors"
-	"github.com/a-novel/go-framework/test"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -29,25 +28,25 @@ func TestValidateNewEmailHandler(t *testing.T) {
 	}{
 		{
 			name:              "Success",
-			id:                test.NumberUUID(1).String(),
+			id:                goframework.NumberUUID(1).String(),
 			code:              "validation-code",
 			shouldCallService: true,
 			expectStatus:      http.StatusNoContent,
 		},
 		{
 			name:              "Error/ErrInvalidCredentials",
-			id:                test.NumberUUID(1).String(),
+			id:                goframework.NumberUUID(1).String(),
 			code:              "validation-code",
 			shouldCallService: true,
-			serviceErr:        errors.ErrInvalidCredentials,
+			serviceErr:        goframework.ErrInvalidCredentials,
 			expectStatus:      http.StatusForbidden,
 		},
 		{
 			name:              "Error/ErrInvalidEntity",
-			id:                test.NumberUUID(1).String(),
+			id:                goframework.NumberUUID(1).String(),
 			code:              "validation-code",
 			shouldCallService: true,
-			serviceErr:        errors.ErrInvalidEntity,
+			serviceErr:        goframework.ErrInvalidEntity,
 			expectStatus:      http.StatusForbidden,
 		},
 	}
