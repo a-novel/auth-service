@@ -1,4 +1,2 @@
-host: https://auth.agoradesecrivains.net
-hostInternal: ${HOST_INTERNAL}
 port: 8080
 portInternal: 8080

@@ -1,4 +1,2 @@
-host: http://localhost
-hostInternal: http://localhost
 port: 2040
 portInternal: 20040
