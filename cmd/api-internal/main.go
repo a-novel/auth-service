@@ -19,8 +19,12 @@ func main() {
 
 	secretKeysDAO, logger := config.GetSecretsRepository(logger)
 
+	generateTokenService := services.NewGenerateTokenService(secretKeysDAO, config.Tokens.TTL)
+	getTokenService := services.NewGetTokenStatusService(secretKeysDAO)
+	introspectTokenService := services.NewIntrospectTokenService(generateTokenService, getTokenService, config.Tokens.RenewDelta)
 	rotateSecretKeysService := services.NewRotateSecretKeysService(secretKeysDAO, keyGen, config.Secrets.Backups)
 
+	introspectTokenHandler := handlers.NewIntrospectTokenHandler(introspectTokenService)
 	rotateSecretKeysHandler := handlers.NewRotateSecretKeysHandler(rotateSecretKeysService)
 
 	router := apis.GetRouter(apis.RouterConfig{
@@ -29,6 +33,7 @@ func main() {
 		Prod:      config.ENV == config.ProdENV,
 	})
 
+	router.GET("/auth", introspectTokenHandler.Handle)
 	router.POST("/rotate-keys", rotateSecretKeysHandler.Handle)
 
 	if err := router.Run(fmt.Sprintf(":%d", config.API.PortInternal)); err != nil {
