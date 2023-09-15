@@ -169,7 +169,6 @@ jobs:
           env_vars: |
             ENV=prod
             PROJECT_ID=${{ vars.PROJECT_ID }}
-            HOST_INTERNAL=${{ secrets.HOST_INTERNAL }}
           service: ${{ vars.APP }}
           region: ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
