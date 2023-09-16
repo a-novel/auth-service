@@ -16,17 +16,17 @@ type ValidateEmailService interface {
 
 func NewValidateEmailService(
 	credentialsDAO dao.CredentialsRepository,
-	authorizationsClient apiclients.AuthorizationsClient,
+	permissionsClient apiclients.PermissionsClient,
 ) ValidateEmailService {
 	return &validateEmailServiceImpl{
-		credentialsDAO:       credentialsDAO,
-		authorizationsClient: authorizationsClient,
+		credentialsDAO:    credentialsDAO,
+		permissionsClient: permissionsClient,
 	}
 }
 
 type validateEmailServiceImpl struct {
-	credentialsDAO       dao.CredentialsRepository
-	authorizationsClient apiclients.AuthorizationsClient
+	credentialsDAO    dao.CredentialsRepository
+	permissionsClient apiclients.PermissionsClient
 }
 
 func (s *validateEmailServiceImpl) ValidateEmail(ctx context.Context, id uuid.UUID, code string, now time.Time) error {
@@ -53,12 +53,12 @@ func (s *validateEmailServiceImpl) ValidateEmail(ctx context.Context, id uuid.UU
 			return goerrors.Join(ErrValidateEmail, err)
 		}
 
-		err = s.authorizationsClient.SetUserAuthorizations(ctx, apiclients.SetUserAuthorizationsForm{
+		err = s.permissionsClient.SetUserPermissions(ctx, apiclients.SetUserPermissionsForm{
 			UserID:    id,
 			SetFields: []string{apiclients.FieldValidatedAccount},
 		})
 		if err != nil {
-			return goerrors.Join(ErrUpdateUserAuthorizations, err)
+			return goerrors.Join(ErrUpdateUserPermissions, err)
 		}
 
 		return nil

@@ -30,11 +30,11 @@ var (
 	ErrInvalidTokenSignature = goerrors.New("(data) invalid token signature")
 	ErrInvalidValidationCode = goerrors.New("(data) invalid validation code")
 
-	ErrIntrospectToken          = goerrors.New("(dep) failed to introspect token")
-	ErrCheckPassword            = goerrors.New("(dep) failed to check password")
-	ErrValidateToken            = goerrors.New("(dep) failed to validate token")
-	ErrVerifyValidationCode     = goerrors.New("(dep) failed to verify validation code")
-	ErrUpdateUserAuthorizations = goerrors.New("(dep) failed to update user authorizations")
+	ErrIntrospectToken       = goerrors.New("(dep) failed to introspect token")
+	ErrCheckPassword         = goerrors.New("(dep) failed to check password")
+	ErrValidateToken         = goerrors.New("(dep) failed to validate token")
+	ErrVerifyValidationCode  = goerrors.New("(dep) failed to verify validation code")
+	ErrUpdateUserPermissions = goerrors.New("(dep) failed to update user permissions")
 
 	ErrCancelNewEmail           = goerrors.New("(dao) failed to cancel new email")
 	ErrEmailExists              = goerrors.New("(dao) failed to check if email exists")

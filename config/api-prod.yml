@@ -1,4 +1,4 @@
 port: 8080
 portInternal: 8080
 external:
-  authorizationsAPI: ${AUTHORIZATIONS_API}
+  permissionsAPI: ${PERMISSIONS_API}
