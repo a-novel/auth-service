@@ -122,7 +122,7 @@ jobs:
           secrets: |
             POSTGRES_URL=agora-auth-service-postgres:latest
             SENDGRID_API_KEY=sendgrid-api-key:latest
-            AUTHORIZATIONS_API=agora-ip-authorizations-service-internal:latest
+            PERMISSIONS_API=agora-ip-permissions-service-internal:latest
           env_vars: |
             ENV=prod
             PROJECT_ID=${{ vars.PROJECT_ID }}

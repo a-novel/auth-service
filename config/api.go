@@ -15,7 +15,7 @@ type ApiConfig struct {
 	Port         int `yaml:"port"`
 	PortInternal int `yaml:"portInternal"`
 	External     struct {
-		AuthorizationsAPI string `yaml:"authorizationsAPI"`
+		PermissionsAPI string `yaml:"permissionsAPI"`
 	} `yaml:"external"`
 }
 

@@ -26,8 +26,8 @@ func TestValidateEmail(t *testing.T) {
 		dao    *dao.CredentialsModel
 		daoErr error
 
-		shouldCallAuthorizationClient bool
-		authorizationClientErr        error
+		shouldCallPermissionsClient bool
+		permissionsClientErr        error
 
 		shouldCallUpdate bool
 		updateErr        error
@@ -44,8 +44,8 @@ func TestValidateEmail(t *testing.T) {
 					Email: dao.Email{User: "user", Domain: "domain", Validation: privateValidationCode},
 				},
 			},
-			shouldCallUpdate:              true,
-			shouldCallAuthorizationClient: true,
+			shouldCallUpdate:            true,
+			shouldCallPermissionsClient: true,
 		},
 		{
 			name: "Error/NoPendingValidation",
@@ -94,7 +94,7 @@ func TestValidateEmail(t *testing.T) {
 			expectErr: fooErr,
 		},
 		{
-			name: "Error/updateAuthorizationsFailure",
+			name: "Error/UpdatePermissionsFailure",
 			id:   goframework.NumberUUID(1),
 			code: publicValidationCode,
 			now:  baseTime,
@@ -103,17 +103,17 @@ func TestValidateEmail(t *testing.T) {
 					Email: dao.Email{User: "user", Domain: "domain", Validation: privateValidationCode},
 				},
 			},
-			shouldCallUpdate:              true,
-			shouldCallAuthorizationClient: true,
-			authorizationClientErr:        fooErr,
-			expectErr:                     fooErr,
+			shouldCallUpdate:            true,
+			shouldCallPermissionsClient: true,
+			permissionsClientErr:        fooErr,
+			expectErr:                   fooErr,
 		},
 	}
 
 	for _, d := range data {
 		t.Run(d.name, func(t *testing.T) {
 			credentialsDAO := daomocks.NewCredentialsRepository(t)
-			authorizationsClient := apiclientsmocks.NewAuthorizationsClient(t)
+			permissionsClient := apiclientsmocks.NewPermissionsClient(t)
 
 			credentialsDAO.
 				On("GetCredentials", context.Background(), d.id).
@@ -132,22 +132,22 @@ func TestValidateEmail(t *testing.T) {
 				})
 			}
 
-			if d.shouldCallAuthorizationClient {
-				authorizationsClient.
-					On("SetUserAuthorizations", context.Background(), apiclients.SetUserAuthorizationsForm{
+			if d.shouldCallPermissionsClient {
+				permissionsClient.
+					On("SetUserPermissions", context.Background(), apiclients.SetUserPermissionsForm{
 						UserID:    d.id,
-						SetFields: []string{"validated_account"},
+						SetFields: []string{apiclients.FieldValidatedAccount},
 					}).
-					Return(d.authorizationClientErr)
+					Return(d.permissionsClientErr)
 			}
 
-			service := services.NewValidateEmailService(credentialsDAO, authorizationsClient)
+			service := services.NewValidateEmailService(credentialsDAO, permissionsClient)
 			err := service.ValidateEmail(context.Background(), d.id, d.code, d.now)
 
 			require.ErrorIs(t, err, d.expectErr)
 
 			credentialsDAO.AssertExpectations(t)
-			authorizationsClient.AssertExpectations(t)
+			permissionsClient.AssertExpectations(t)
 		})
 	}
 }

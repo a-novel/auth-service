@@ -6,11 +6,11 @@ import (
 	"net/url"
 )
 
-func GetAuthorizationsClient(logger zerolog.Logger) apiclients.AuthorizationsClient {
-	authorizationsURL, err := new(url.URL).Parse(API.External.AuthorizationsAPI)
+func GetPermissionsClient(logger zerolog.Logger) apiclients.PermissionsClient {
+	permissionsURL, err := new(url.URL).Parse(API.External.PermissionsAPI)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("could not parse auth API URL")
 	}
 
-	return apiclients.NewAuthorizationsClient(authorizationsURL)
+	return apiclients.NewPermissionsClient(permissionsURL)
 }
