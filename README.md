@@ -56,6 +56,16 @@ make run
 ```
 ```bash
 curl http://localhost:2040/ping
+# Or curl http://localhost:2040/healthcheck
+```
+
+### Run the internal API
+
+```bash
+make run-internal
+```
+```bash
+curl http://localhost:20040/ping
 # Or curl http://localhost:20040/healthcheck
 ```
 

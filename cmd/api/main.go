@@ -23,6 +23,7 @@ func getFrontendURL(value string) string {
 func main() {
 	ctx := context.Background()
 	logger := config.GetLogger()
+	authorizationsClient := config.GetAuthorizationsClient(logger)
 
 	postgres, sql, err := bunovel.NewClient(ctx, bunovel.Config{
 		Driver:                &bunovel.PGDriver{DSN: config.Postgres.DSN, AppName: config.App.Name},
@@ -66,7 +67,7 @@ func main() {
 	updateIdentityService := services.NewUpdateIdentityService(identityDAO, introspectTokenService)
 	updatePasswordService := services.NewUpdatePasswordService(credentialsDAO)
 	updateProfileService := services.NewUpdateProfileService(profileDAO, introspectTokenService)
-	validateEmailService := services.NewValidateEmailService(credentialsDAO)
+	validateEmailService := services.NewValidateEmailService(credentialsDAO, authorizationsClient)
 	validateNewEmailService := services.NewValidateNewEmailService(credentialsDAO)
 
 	introspectTokenHandler := handlers.NewIntrospectTokenHandler(introspectTokenService)
@@ -96,7 +97,10 @@ func main() {
 		Prod:      config.ENV == config.ProdENV,
 		Health: map[string]apis.HealthChecker{
 			"postgres": func() error {
-				return postgres.PingContext(context.Background())
+				return postgres.PingContext(ctx)
+			},
+			"authorizations-client": func() error {
+				return authorizationsClient.Ping(ctx)
 			},
 		},
 	})

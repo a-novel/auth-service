@@ -12,8 +12,3 @@ packages:
       all: True
       outpkg: servicesmocks
       dir: pkg/services/mocks
-  github.com/a-novel/auth-service/framework:
-    config:
-      all: True
-      outpkg: frameworkmocks
-      dir: framework/mocks
