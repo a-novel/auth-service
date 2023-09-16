@@ -1,2 +1,4 @@
 port: 2040
 portInternal: 20040
+external:
+  authorizationsAPI: http://localhost:20043

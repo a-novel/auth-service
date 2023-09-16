@@ -14,6 +14,9 @@ var apiProdFile []byte
 type ApiConfig struct {
 	Port         int `yaml:"port"`
 	PortInternal int `yaml:"portInternal"`
+	External     struct {
+		AuthorizationsAPI string `yaml:"authorizationsAPI"`
+	} `yaml:"external"`
 }
 
 var API *ApiConfig

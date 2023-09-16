@@ -48,6 +48,8 @@ type CredentialsRepository interface {
 	// ResetPassword sets Password.Validation field. The code value MUST be hashed. This does not nullify the
 	// Password.Hashed field, so authentication can still work while password is being reset.
 	ResetPassword(ctx context.Context, code string, email Email, now time.Time) (*CredentialsModel, error)
+
+	RunInTx(ctx context.Context, callback func(ctx context.Context, txRepository CredentialsRepository) error) error
 }
 
 type CredentialsModel struct {
@@ -302,4 +304,10 @@ func (repository *credentialsRepositoryImpl) CancelNewEmail(ctx context.Context,
 	}
 
 	return model, nil
+}
+
+func (repository *credentialsRepositoryImpl) RunInTx(ctx context.Context, callback func(ctx context.Context, txRepository CredentialsRepository) error) error {
+	return repository.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		return callback(ctx, NewCredentialsRepository(tx))
+	})
 }

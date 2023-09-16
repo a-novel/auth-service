@@ -4,10 +4,11 @@ go 1.21.1
 
 require (
 	cloud.google.com/go/storage v1.33.0
-	github.com/a-novel/bunovel v1.0.0
-	github.com/a-novel/go-apis v1.0.2
-	github.com/a-novel/go-framework v1.0.1
-	github.com/a-novel/sendgrid-proxy v1.0.0
+	github.com/a-novel/bunovel v1.0.1
+	github.com/a-novel/go-api-clients v1.0.4
+	github.com/a-novel/go-apis v1.0.3
+	github.com/a-novel/go-framework v1.0.2
+	github.com/a-novel/sendgrid-proxy v1.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.1
@@ -15,7 +16,7 @@ require (
 	github.com/samber/lo v1.38.1
 	github.com/sendgrid/sendgrid-go v3.13.0+incompatible
 	github.com/stretchr/testify v1.8.4
-	github.com/uptrace/bun v1.1.15
+	github.com/uptrace/bun v1.1.16
 	golang.org/x/crypto v0.13.0
 	google.golang.org/api v0.141.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -57,8 +58,8 @@ require (
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/uptrace/bun/dialect/pgdialect v1.1.15 // indirect
-	github.com/uptrace/bun/driver/pgdriver v1.1.15 // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.1.16 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.1.16 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
