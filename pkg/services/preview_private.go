@@ -61,11 +61,11 @@ func (s *previewPrivateServiceImpl) Preview(ctx context.Context, tokenRaw string
 	}
 
 	return &models.UserPreviewPrivate{
-		ID:        token.Token.Payload.ID,
 		Email:     credentials.Email.String(),
 		NewEmail:  credentials.NewEmail.String(),
 		Validated: credentials.Email.Validation == "",
 		UserPreview: models.UserPreview{
+			ID:        token.Token.Payload.ID,
 			FirstName: identity.FirstName,
 			LastName:  identity.LastName,
 			Username:  profile.Username,

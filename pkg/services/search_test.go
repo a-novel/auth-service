@@ -65,12 +65,14 @@ func TestSearch(t *testing.T) {
 			userDAOCount: 20,
 			expect: []*models.UserPreview{
 				{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name-1",
 					LastName:  "surname-1",
 					Slug:      "slug-1",
 					CreatedAt: baseTime,
 				},
 				{
+					ID:        goframework.NumberUUID(2),
 					Username:  "username-2",
 					Slug:      "slug-2",
 					CreatedAt: baseTime,

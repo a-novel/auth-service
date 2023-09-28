@@ -31,6 +31,7 @@ func (s *listServiceImpl) List(ctx context.Context, ids []uuid.UUID) ([]*models.
 
 	return lo.Map(users, func(item *dao.UserModel, _ int) *models.UserPreview {
 		return &models.UserPreview{
+			ID:        item.ID,
 			FirstName: lo.Ternary(item.Profile.Username == "", item.Identity.FirstName, ""),
 			LastName:  lo.Ternary(item.Profile.Username == "", item.Identity.LastName, ""),
 			Username:  item.Profile.Username,

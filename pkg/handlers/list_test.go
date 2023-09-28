@@ -36,11 +36,13 @@ func TestListHandler(t *testing.T) {
 			shouldCallServiceWith: []uuid.UUID{goframework.NumberUUID(1), goframework.NumberUUID(2)},
 			serviceResp: []*models.UserPreview{
 				{
+					ID:        goframework.NumberUUID(1),
 					Username:  "username 1",
 					Slug:      "slug 1",
 					CreatedAt: baseTime,
 				},
 				{
+					ID:        goframework.NumberUUID(2),
 					FirstName: "first name 2",
 					LastName:  "last name 2",
 					Slug:      "slug 2",
@@ -50,16 +52,15 @@ func TestListHandler(t *testing.T) {
 			expect: map[string]interface{}{
 				"users": []interface{}{
 					map[string]interface{}{
-						"firstName": "",
-						"lastName":  "",
+						"id":        goframework.NumberUUID(1).String(),
 						"username":  "username 1",
 						"slug":      "slug 1",
 						"createdAt": baseTime.Format(time.RFC3339),
 					},
 					map[string]interface{}{
+						"id":        goframework.NumberUUID(2).String(),
 						"firstName": "first name 2",
 						"lastName":  "last name 2",
-						"username":  "",
 						"slug":      "slug 2",
 						"createdAt": baseTime.Format(time.RFC3339),
 					},
@@ -82,6 +83,7 @@ func TestListHandler(t *testing.T) {
 			shouldCallServiceWith: []uuid.UUID{goframework.NumberUUID(2)},
 			serviceResp: []*models.UserPreview{
 				{
+					ID:        goframework.NumberUUID(2),
 					FirstName: "first name 2",
 					LastName:  "last name 2",
 					Slug:      "slug 2",
@@ -91,9 +93,9 @@ func TestListHandler(t *testing.T) {
 			expect: map[string]interface{}{
 				"users": []interface{}{
 					map[string]interface{}{
+						"id":        goframework.NumberUUID(2).String(),
 						"firstName": "first name 2",
 						"lastName":  "last name 2",
-						"username":  "",
 						"slug":      "slug 2",
 						"createdAt": baseTime.Format(time.RFC3339),
 					},

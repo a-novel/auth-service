@@ -37,6 +37,7 @@ func (s *previewServiceImpl) Preview(ctx context.Context, slug string) (*models.
 	}
 
 	return &models.UserPreview{
+		ID: identity.ID,
 		// Don't return user real name if a username is set.
 		FirstName: lo.Ternary(profile.Username == "", identity.FirstName, ""),
 		LastName:  lo.Ternary(profile.Username == "", identity.LastName, ""),
