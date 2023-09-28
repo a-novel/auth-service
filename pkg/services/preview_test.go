@@ -51,6 +51,7 @@ func TestPreview(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreview{
+				ID:        goframework.NumberUUID(1),
 				FirstName: "name",
 				LastName:  "last-name",
 				Slug:      "slug",
@@ -79,6 +80,7 @@ func TestPreview(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreview{
+				ID:        goframework.NumberUUID(1),
 				Username:  "username",
 				Slug:      "slug",
 				CreatedAt: baseTime,

@@ -651,7 +651,7 @@ func TestRegister(t *testing.T) {
 				Password:  "password",
 				FirstName: "name",
 				LastName:  "last-name",
-				Sex:       models.Sex("non-binary"),
+				Sex:       models.Sex("invalid sex"),
 				Birthday:  baseTime.Add(-20 * timeYear),
 				Slug:      "slug",
 				Username:  "username",

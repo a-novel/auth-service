@@ -31,11 +31,11 @@ func TestPreviewPrivateHandler(t *testing.T) {
 			name:          "Success",
 			authorization: "Bearer token",
 			serviceResp: &models.UserPreviewPrivate{
-				ID:        goframework.NumberUUID(1),
 				Email:     "email",
 				NewEmail:  "new-email",
 				Validated: true,
 				UserPreview: models.UserPreview{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name",
 					LastName:  "last-name",
 					Username:  "username",

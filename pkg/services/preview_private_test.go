@@ -74,10 +74,10 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: true,
 				UserPreview: models.UserPreview{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name",
 					LastName:  "last-name",
 					Slug:      "slug",
@@ -121,10 +121,10 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: true,
 				UserPreview: models.UserPreview{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name",
 					LastName:  "last-name",
 					Username:  "username",
@@ -170,11 +170,11 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				NewEmail:  "new-user@domain.com",
 				Validated: true,
 				UserPreview: models.UserPreview{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name",
 					LastName:  "last-name",
 					Username:  "username",
@@ -218,10 +218,10 @@ func TestPreviewPrivate(t *testing.T) {
 				},
 			},
 			expect: &models.UserPreviewPrivate{
-				ID:        goframework.NumberUUID(1),
 				Email:     "user@domain.com",
 				Validated: false,
 				UserPreview: models.UserPreview{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name",
 					LastName:  "last-name",
 					Slug:      "slug",

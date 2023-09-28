@@ -68,11 +68,13 @@ func TestList(t *testing.T) {
 			},
 			expect: []*models.UserPreview{
 				{
+					ID:        goframework.NumberUUID(1),
 					Username:  "username-1",
 					Slug:      "slug-1",
 					CreatedAt: baseTime,
 				},
 				{
+					ID:        goframework.NumberUUID(2),
 					FirstName: "name-2",
 					LastName:  "last-name-2",
 					Slug:      "slug-2",

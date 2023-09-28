@@ -201,7 +201,7 @@ func TestUpdateIdentity(t *testing.T) {
 			form: models.UpdateIdentityForm{
 				FirstName: "name",
 				LastName:  "last-name",
-				Sex:       models.Sex("non-binary"),
+				Sex:       models.Sex("invalid sex"),
 				Birthday:  time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC),
 			},
 			introspectToken: &models.UserTokenStatus{

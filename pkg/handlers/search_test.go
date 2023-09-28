@@ -39,6 +39,7 @@ func TestSearchHandler(t *testing.T) {
 			shouldCallService: true,
 			serviceResp: []*models.UserPreview{
 				{
+					ID:        goframework.NumberUUID(1),
 					FirstName: "name-1",
 					LastName:  "surname-1",
 					Username:  "username-1",
@@ -46,6 +47,7 @@ func TestSearchHandler(t *testing.T) {
 					CreatedAt: baseTime,
 				},
 				{
+					ID:        goframework.NumberUUID(2),
 					FirstName: "name-2",
 					LastName:  "surname-2",
 					Username:  "username-2",
@@ -58,6 +60,7 @@ func TestSearchHandler(t *testing.T) {
 				"total": float64(200),
 				"res": []interface{}{
 					map[string]interface{}{
+						"id":        goframework.NumberUUID(1).String(),
 						"firstName": "name-1",
 						"lastName":  "surname-1",
 						"username":  "username-1",
@@ -65,6 +68,7 @@ func TestSearchHandler(t *testing.T) {
 						"createdAt": baseTime.Format(time.RFC3339),
 					},
 					map[string]interface{}{
+						"id":        goframework.NumberUUID(2).String(),
 						"firstName": "name-2",
 						"lastName":  "surname-2",
 						"username":  "username-2",

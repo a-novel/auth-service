@@ -6,6 +6,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
 	"github.com/a-novel/bunovel"
+	goframework "github.com/a-novel/go-framework"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -30,6 +31,7 @@ func TestPreviewHandler(t *testing.T) {
 			name: "Success",
 			slug: "slug",
 			serviceResp: &models.UserPreview{
+				ID:        goframework.NumberUUID(1),
 				FirstName: "name",
 				LastName:  "last-name",
 				Username:  "username",
@@ -37,6 +39,7 @@ func TestPreviewHandler(t *testing.T) {
 				CreatedAt: baseTime,
 			},
 			expect: map[string]interface{}{
+				"id":        goframework.NumberUUID(1).String(),
 				"firstName": "name",
 				"lastName":  "last-name",
 				"username":  "username",
