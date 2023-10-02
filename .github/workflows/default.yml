@@ -130,7 +130,7 @@ jobs:
           region: ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
           image: ${{ env.IMAGE_NAME }}
-          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --set-cloudsql-instances=agora-postgres --port=8080 --cpu-boost --vpc-connector=agora-infra-connector'
+          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --set-cloudsql-instances=agora-postgres --port=8080'
       - name: 'show output'
         run: echo ${{ steps.deploy.outputs.url }}
 

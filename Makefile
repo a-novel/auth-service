@@ -33,10 +33,10 @@ db-test:
 	psql -h localhost -p 5432 -U test agora_users_test
 
 run:
-	go run ./cmd/api/main.go
+	direnv allow . && source .envrc && go run ./cmd/api/main.go
 
 run-internal:
-	go run ./cmd/api-internal/main.go
+	direnv allow . && source .envrc && go run ./cmd/api-internal/main.go
 
 rotate-keys:
 	curl -X POST http://localhost:20040/cloud/rotate-keys
