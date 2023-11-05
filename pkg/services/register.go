@@ -26,8 +26,8 @@ func NewRegisterService(
 	mailer sendgridproxy.Mailer,
 	generateValidationCode func() (string, string, error),
 	generateTokenService GenerateTokenService,
-	validateEmailTemplate string,
 	validateEmailLink string,
+	validateEmailTemplate string,
 ) RegisterService {
 	return &registerServiceImpl{
 		credentialsDAO:         credentialsDAO,

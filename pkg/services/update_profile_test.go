@@ -7,6 +7,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	servicesmocks "github.com/a-novel/auth-service/pkg/services/mocks"
+	"github.com/a-novel/bunovel"
 	goframework "github.com/a-novel/go-framework"
 	"github.com/stretchr/testify/require"
 	"strings"
@@ -26,7 +27,7 @@ func TestUpdateProfile(t *testing.T) {
 		introspectTokenErr error
 
 		shouldCallSlugExists bool
-		slugExists           bool
+		slugExists           *dao.ProfileModel
 		slugExistsErr        error
 
 		shouldCallDAO bool
@@ -48,7 +49,7 @@ func TestUpdateProfile(t *testing.T) {
 				},
 			},
 			shouldCallSlugExists: true,
-			slugExists:           false,
+			slugExists:           nil,
 			shouldCallDAO:        true,
 		},
 		{
@@ -66,7 +67,7 @@ func TestUpdateProfile(t *testing.T) {
 				},
 			},
 			shouldCallSlugExists: true,
-			slugExists:           false,
+			slugExists:           nil,
 			shouldCallDAO:        true,
 		},
 		{
@@ -158,7 +159,7 @@ func TestUpdateProfile(t *testing.T) {
 				},
 			},
 			shouldCallSlugExists: true,
-			slugExists:           false,
+			slugExists:           nil,
 			shouldCallDAO:        true,
 			daoErr:               fooErr,
 			expectErr:            fooErr,
@@ -177,8 +178,29 @@ func TestUpdateProfile(t *testing.T) {
 				},
 			},
 			shouldCallSlugExists: true,
-			slugExists:           true,
-			expectErr:            services.ErrTaken,
+			slugExists: &dao.ProfileModel{
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1000), baseTime, &baseTime),
+			},
+			expectErr: services.ErrTaken,
+		},
+		{
+			name:     "Success/SlugExists/ButSameUser",
+			tokenRaw: "string-token",
+			now:      baseTime,
+			form: models.UpdateProfileForm{
+				Slug: "slug",
+			},
+			introspectToken: &models.UserTokenStatus{
+				OK: true,
+				Token: &models.UserToken{
+					Payload: models.UserTokenPayload{ID: goframework.NumberUUID(1)},
+				},
+			},
+			shouldCallSlugExists: true,
+			slugExists: &dao.ProfileModel{
+				Metadata: bunovel.NewMetadata(goframework.NumberUUID(1), baseTime, &baseTime),
+			},
+			shouldCallDAO: true,
 		},
 		{
 			name:     "Error/SlugCheckFailure",
@@ -234,7 +256,7 @@ func TestUpdateProfile(t *testing.T) {
 
 			if d.shouldCallSlugExists {
 				profileDAO.
-					On("SlugExists", context.Background(), d.form.Slug).
+					On("GetProfileBySlug", context.Background(), d.form.Slug).
 					Return(d.slugExists, d.slugExistsErr)
 			}
 

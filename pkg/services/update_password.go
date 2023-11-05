@@ -60,7 +60,12 @@ func (s *updatePasswordServiceImpl) UpdatePassword(ctx context.Context, form mod
 		}
 	}
 
-	if _, err := s.credentialsDAO.UpdatePassword(ctx, form.NewPassword, form.ID, now); err != nil {
+	passwordHashed, err := bcrypt.GenerateFromPassword([]byte(form.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return goerrors.Join(ErrHashPassword, err)
+	}
+
+	if _, err := s.credentialsDAO.UpdatePassword(ctx, string(passwordHashed), form.ID, now); err != nil {
 		return goerrors.Join(ErrUpdatePassword, err)
 	}
 

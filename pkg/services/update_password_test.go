@@ -7,6 +7,7 @@ import (
 	"github.com/a-novel/auth-service/pkg/models"
 	"github.com/a-novel/auth-service/pkg/services"
 	goframework "github.com/a-novel/go-framework"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
@@ -179,7 +180,7 @@ func TestUpdatePassword(t *testing.T) {
 
 			if d.shouldCallUpdateCredentials {
 				credentialsDAO.
-					On("UpdatePassword", context.Background(), d.form.NewPassword, d.form.ID, d.now).
+					On("UpdatePassword", context.Background(), mock.Anything, d.form.ID, d.now).
 					Return(nil, d.updateCredentialsErr)
 			}
 

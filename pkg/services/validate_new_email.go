@@ -4,6 +4,7 @@ import (
 	"context"
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
+	apiclients "github.com/a-novel/go-apis/clients"
 	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"time"
@@ -15,14 +16,17 @@ type ValidateNewEmailService interface {
 
 func NewValidateNewEmailService(
 	credentialsDAO dao.CredentialsRepository,
+	permissionsClient apiclients.PermissionsClient,
 ) ValidateNewEmailService {
 	return &validateNewEmailServiceImpl{
-		credentialsDAO: credentialsDAO,
+		credentialsDAO:    credentialsDAO,
+		permissionsClient: permissionsClient,
 	}
 }
 
 type validateNewEmailServiceImpl struct {
-	credentialsDAO dao.CredentialsRepository
+	credentialsDAO    dao.CredentialsRepository
+	permissionsClient apiclients.PermissionsClient
 }
 
 func (s *validateNewEmailServiceImpl) ValidateNewEmail(ctx context.Context, id uuid.UUID, code string, now time.Time) error {
@@ -43,9 +47,24 @@ func (s *validateNewEmailServiceImpl) ValidateNewEmail(ctx context.Context, id u
 		return goerrors.Join(goframework.ErrInvalidCredentials, ErrInvalidValidationCode)
 	}
 
-	_, err = s.credentialsDAO.ValidateNewEmail(ctx, id, now)
+	err = s.credentialsDAO.RunInTx(ctx, func(ctx context.Context, txClient dao.CredentialsRepository) error {
+		_, err = txClient.ValidateNewEmail(ctx, id, now)
+		if err != nil {
+			return goerrors.Join(ErrValidateEmail, err)
+		}
+
+		err = s.permissionsClient.SetUserPermissions(ctx, apiclients.SetUserPermissionsForm{
+			UserID:    id,
+			SetFields: []string{apiclients.FieldValidatedAccount},
+		})
+		if err != nil {
+			return goerrors.Join(ErrUpdateUserPermissions, err)
+		}
+
+		return nil
+	})
 	if err != nil {
-		return goerrors.Join(ErrValidateEmail, err)
+		return err
 	}
 
 	return nil
