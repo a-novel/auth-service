@@ -5,6 +5,7 @@ import (
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
 	"github.com/a-novel/auth-service/pkg/models"
+	"github.com/a-novel/bunovel"
 	goframework "github.com/a-novel/go-framework"
 	"time"
 )
@@ -50,11 +51,13 @@ func (s *updateProfileServiceImpl) UpdateProfile(ctx context.Context, tokenRaw s
 		}
 	}
 
-	slugExists, err := s.profileDAO.SlugExists(ctx, form.Slug)
-	if err != nil {
+	// We don't use slugExist here, because the user may want to update other fields and keep its slug. To check if
+	// slug is available, we must also validate it is taken by a different user than the one performing the update.
+	profileWithSameSlug, err := s.profileDAO.GetProfileBySlug(ctx, form.Slug)
+	if err != nil && !goerrors.Is(err, bunovel.ErrNotFound) {
 		return goerrors.Join(ErrSlugExists, err)
 	}
-	if slugExists {
+	if profileWithSameSlug != nil && profileWithSameSlug.ID != token.Token.Payload.ID {
 		return goerrors.Join(goframework.ErrInvalidEntity, ErrInvalidSlug, ErrTaken)
 	}
 

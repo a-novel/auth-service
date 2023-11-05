@@ -785,7 +785,7 @@ func TestRegister(t *testing.T) {
 					Return(d.createUser, d.createUserErr)
 			}
 
-			service := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailerService, generateLink, generateTokenService, d.validateEmailTemplate, d.validateEmailLink)
+			service := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailerService, generateLink, generateTokenService, d.validateEmailLink, d.validateEmailTemplate)
 			res, deferred, err := service.Register(context.Background(), d.form, d.now)
 
 			require.ErrorIs(t, err, d.expectErr)

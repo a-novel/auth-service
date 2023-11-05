@@ -4,7 +4,7 @@ import (
 	"context"
 	goerrors "errors"
 	"github.com/a-novel/auth-service/pkg/dao"
-	apiclients "github.com/a-novel/go-api-clients"
+	apiclients "github.com/a-novel/go-apis/clients"
 	goframework "github.com/a-novel/go-framework"
 	"github.com/google/uuid"
 	"time"
@@ -48,7 +48,7 @@ func (s *validateEmailServiceImpl) ValidateEmail(ctx context.Context, id uuid.UU
 	}
 
 	err = s.credentialsDAO.RunInTx(ctx, func(ctx context.Context, txClient dao.CredentialsRepository) error {
-		_, err = s.credentialsDAO.ValidateEmail(ctx, id, now)
+		_, err = txClient.ValidateEmail(ctx, id, now)
 		if err != nil {
 			return goerrors.Join(ErrValidateEmail, err)
 		}

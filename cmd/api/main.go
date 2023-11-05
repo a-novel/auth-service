@@ -57,18 +57,21 @@ func main() {
 	loginService := services.NewLoginService(credentialsDAO, generateTokenService)
 	previewService := services.NewPreviewService(profileDAO, identityDAO)
 	previewPrivateService := services.NewPreviewPrivateService(credentialsDAO, profileDAO, identityDAO, introspectTokenService)
-	registerService := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailClient, goframework.GenerateCode, generateTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
-	resendEmailValidationService := services.NewResendEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailValidation, getFrontendURL(config.App.Frontend.Routes.ValidateEmail))
-	resendNewEmailValidationService := services.NewResendNewEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
-	resetPasswordService := services.NewResetPasswordService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, config.Mailer.Templates.PasswordReset, getFrontendURL(config.App.Frontend.Routes.ResetPassword))
+	registerService := services.NewRegisterService(credentialsDAO, profileDAO, userDAO, mailClient, goframework.GenerateCode, generateTokenService, getFrontendURL(config.App.Frontend.Routes.ValidateEmail), config.Mailer.Templates.EmailValidation)
+	resendEmailValidationService := services.NewResendEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, getFrontendURL(config.App.Frontend.Routes.ValidateEmail), config.Mailer.Templates.EmailValidation)
+	resendNewEmailValidationService := services.NewResendNewEmailValidationService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail), config.Mailer.Templates.EmailUpdate)
+	resetPasswordService := services.NewResetPasswordService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, getFrontendURL(config.App.Frontend.Routes.ResetPassword), config.Mailer.Templates.PasswordReset)
 	searchService := services.NewSearchService(userDAO)
 	slugExistsService := services.NewSlugExistsService(profileDAO)
-	updateEmailService := services.NewUpdateEmailService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, config.Mailer.Templates.EmailUpdate, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail))
+	updateEmailService := services.NewUpdateEmailService(credentialsDAO, identityDAO, mailClient, goframework.GenerateCode, introspectTokenService, getFrontendURL(config.App.Frontend.Routes.ValidateNewEmail), config.Mailer.Templates.EmailUpdate)
 	updateIdentityService := services.NewUpdateIdentityService(identityDAO, introspectTokenService)
 	updatePasswordService := services.NewUpdatePasswordService(credentialsDAO)
 	updateProfileService := services.NewUpdateProfileService(profileDAO, introspectTokenService)
 	validateEmailService := services.NewValidateEmailService(credentialsDAO, permissionsClient)
-	validateNewEmailService := services.NewValidateNewEmailService(credentialsDAO)
+	validateNewEmailService := services.NewValidateNewEmailService(credentialsDAO, permissionsClient)
+	getCredentialsService := services.NewGetCredentialsService(credentialsDAO, introspectTokenService)
+	getIdentityService := services.NewGetIdentityService(identityDAO, introspectTokenService)
+	getProfileService := services.NewGetProfileService(profileDAO, introspectTokenService)
 
 	introspectTokenHandler := handlers.NewIntrospectTokenHandler(introspectTokenService)
 	cancelNewEmailHandler := handlers.NewCancelNewEmailHandler(cancelNewEmailService)
@@ -89,6 +92,9 @@ func main() {
 	updateProfileHandler := handlers.NewUpdateProfileHandler(updateProfileService)
 	validateEmailHandler := handlers.NewValidateEmailHandler(validateEmailService)
 	validateNewEmailHandler := handlers.NewValidateNewEmailHandler(validateNewEmailService)
+	getCredentialsHandler := handlers.NewGetCredentialsHandler(getCredentialsService)
+	getIdentityHandler := handlers.NewGetIdentityHandler(getIdentityService)
+	getProfileHandler := handlers.NewGetProfileHandler(getProfileService)
 
 	router := apis.GetRouter(apis.RouterConfig{
 		Logger:    logger,
@@ -105,24 +111,41 @@ func main() {
 		},
 	})
 
+	// /auth
 	router.GET("/auth", introspectTokenHandler.Handle)
 	router.POST("/auth", loginHandler.Handle)
 	router.PUT("/auth", registerHandler.Handle)
+	// /email
 	router.DELETE("/email", cancelNewEmailHandler.Handle)
-	router.DELETE("/password", resetPasswordHandler.Handle)
 	router.PATCH("/email", updateEmailHandler.Handle)
-	router.PATCH("/identity", updateIdentityHandler.Handle)
-	router.PATCH("/profile", updateProfileHandler.Handle)
+	// /password
+	router.DELETE("/password", resetPasswordHandler.Handle)
 	router.PATCH("/password", updatePasswordHandler.Handle)
+	// /credentials
+	router.GET("/credentials", getCredentialsHandler.Handle)
+	// /identity
+	router.PATCH("/identity", updateIdentityHandler.Handle)
+	router.GET("/identity", getIdentityHandler.Handle)
+	// /profile
+	router.PATCH("/profile", updateProfileHandler.Handle)
+	router.GET("/profile", getProfileHandler.Handle)
+	// /email/validation
 	router.PATCH("/email/validation", resendEmailValidationHandler.Handle)
-	router.PATCH("/email/pending/validation", resendNewEmailValidationHandler.Handle)
 	router.GET("/email/validation", validateEmailHandler.Handle)
+	// //email/pending/validation
+	router.PATCH("/email/pending/validation", resendNewEmailValidationHandler.Handle)
 	router.GET("/email/pending/validation", validateNewEmailHandler.Handle)
+	// /email/exists
 	router.GET("/email/exists", emailExistsHandler.Handle)
+	// /slug/exists
 	router.GET("/slug/exists", slugExistsHandler.Handle)
+	// /uses
 	router.GET("/users", listHandler.Handle)
+	// /uses/search
 	router.GET("/users/search", searchHandler.Handle)
+	// /user
 	router.GET("/user", previewHandler.Handle)
+	// /user/me
 	router.GET("/user/me", previewPrivateHandler.Handle)
 
 	if err := router.Run(fmt.Sprintf(":%d", config.API.Port)); err != nil {

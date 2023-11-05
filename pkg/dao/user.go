@@ -44,19 +44,19 @@ func (repository *userRepositoryImpl) Create(ctx context.Context, data *UserMode
 	// Create all in a transaction, to avoid partially created users if any part of the operation fails.
 	err := repository.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		credentialsModel := &CredentialsModel{Metadata: bunovel.NewMetadata(id, now, nil), CredentialsModelCore: data.Credentials}
-		_, err := repository.db.NewInsert().Model(credentialsModel).Exec(ctx)
+		_, err := tx.NewInsert().Model(credentialsModel).Exec(ctx)
 		if err != nil {
 			return err
 		}
 
 		identityModel := &IdentityModel{Metadata: bunovel.NewMetadata(id, now, nil), IdentityModelCore: data.Identity}
-		_, err = repository.db.NewInsert().Model(identityModel).Exec(ctx)
+		_, err = tx.NewInsert().Model(identityModel).Exec(ctx)
 		if err != nil {
 			return err
 		}
 
 		profileModel := &ProfileModel{Metadata: bunovel.NewMetadata(id, now, nil), ProfileModelCore: data.Profile}
-		_, err = repository.db.NewInsert().Model(profileModel).Exec(ctx)
+		_, err = tx.NewInsert().Model(profileModel).Exec(ctx)
 		if err != nil {
 			return err
 		}
