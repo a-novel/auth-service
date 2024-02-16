@@ -86,131 +86,131 @@ jobs:
   # --------------------------------------------------------------------------------
   # Deploy stage
   # --------------------------------------------------------------------------------
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [ build-docker ]
-    if: github.ref == 'refs/heads/master' && success()
-    environment: production
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'authenticate gcloud'
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      - name: 'setup gcloud'
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ vars.PROJECT_ID }}
-      - name: 'docker auth'
-        run: |-
-          gcloud auth configure-docker ${{ vars.GAR_LOCATION }}-docker.pkg.dev
-      - name: 'create image name'
-        run: |-
-          echo "IMAGE_NAME=${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.APP }}/${{ vars.APP }}:${{ github.sha }}" >> $GITHUB_ENV
-      - name: 'build and push container'
-        run: |-
-          docker build -f Dockerfile -t "${{ env.IMAGE_NAME }}" ./
-          docker push "${{ env.IMAGE_NAME }}"
-      - name: 'deploy to google cloud run'
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v1
-        with:
-          secrets: |
-            POSTGRES_URL=agora-auth-service-postgres:latest
-            SENDGRID_API_KEY=sendgrid-api-key:latest
-            PERMISSIONS_API=agora-ip-permissions-service-internal:latest
-          env_vars: |
-            ENV=prod
-            PROJECT_ID=${{ vars.PROJECT_ID }}
-          service: ${{ vars.APP }}
-          region: ${{ vars.REGION }}
-          project_id: ${{ vars.PROJECT_ID }}
-          image: ${{ env.IMAGE_NAME }}
-          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --set-cloudsql-instances=agora-postgres --port=8080 --vpc-connector=agora-infra-connector'
-      - name: 'show output'
-        run: echo ${{ steps.deploy.outputs.url }}
-
-  deploy-internal:
-    runs-on: ubuntu-latest
-    needs: [ build-docker-internal ]
-    if: github.ref == 'refs/heads/master' && success()
-    environment: production internal
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'authenticate gcloud'
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      - name: 'setup gcloud'
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ vars.PROJECT_ID }}
-      - name: 'docker auth'
-        run: |-
-          gcloud auth configure-docker ${{ vars.GAR_LOCATION }}-docker.pkg.dev
-      - name: 'create image name'
-        run: |-
-          echo "IMAGE_NAME=${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.APP }}/${{ vars.APP }}:${{ github.sha }}" >> $GITHUB_ENV
-      - name: 'build and push container'
-        run: |-
-          docker build -f Dockerfile.internal -t "${{ env.IMAGE_NAME }}" ./
-          docker push "${{ env.IMAGE_NAME }}"
-      - name: 'deploy to google cloud run'
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v1
-        with:
-          env_vars: |
-            ENV=prod
-            PROJECT_ID=${{ vars.PROJECT_ID }}
-          service: ${{ vars.APP }}
-          region: ${{ vars.REGION }}
-          project_id: ${{ vars.PROJECT_ID }}
-          image: ${{ env.IMAGE_NAME }}
-          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --port=8080 --cpu-boost --vpc-connector=agora-infra-connector --ingress=internal'
-      - name: 'show output'
-        run: echo ${{ steps.deploy.outputs.url }}
-
-  deploy-keys-rotator:
-    runs-on: ubuntu-latest
-    needs: [ deploy-internal ]
-    if: github.ref == 'refs/heads/master' && success()
-    environment: production keys rotator
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'authenticate gcloud'
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      - name: 'setup gcloud'
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ vars.PROJECT_ID }}
-      - name: 'delete the previous task if any'
-        continue-on-error: true
-        run: |-
-          gcloud scheduler jobs delete --location ${{ vars.REGION }} ${{ vars.TASK_NAME }} --quiet 2>/dev/null
-      - name: 'create the task'
-        run: |-
-          gcloud scheduler jobs create http ${{ vars.TASK_NAME }} \
-              --location ${{ vars.REGION }} \
-              --description "Rotate the secret keys used to sign users tokens." \
-              --schedule "0 4 * * *" \
-              --uri "${{ secrets.HOST_INTERNAL }}/rotate-keys" \
-              --http-method POST \
-              --max-retry-attempts=5 \
-              --attempt-deadline=120s \
-              --max-backoff=5m \
-              --oidc-service-account-email="${{ secrets.SCHEDULER_SERVICE_ACCOUNT }}" \
-              --quiet
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: [ build-docker ]
+#    if: github.ref == 'refs/heads/master' && success()
+#    environment: production
+#    permissions:
+#      contents: read
+#      id-token: write
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: 'authenticate gcloud'
+#        uses: google-github-actions/auth@v1
+#        with:
+#          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
+#          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+#      - name: 'setup gcloud'
+#        uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: ${{ vars.PROJECT_ID }}
+#      - name: 'docker auth'
+#        run: |-
+#          gcloud auth configure-docker ${{ vars.GAR_LOCATION }}-docker.pkg.dev
+#      - name: 'create image name'
+#        run: |-
+#          echo "IMAGE_NAME=${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.APP }}/${{ vars.APP }}:${{ github.sha }}" >> $GITHUB_ENV
+#      - name: 'build and push container'
+#        run: |-
+#          docker build -f Dockerfile -t "${{ env.IMAGE_NAME }}" ./
+#          docker push "${{ env.IMAGE_NAME }}"
+#      - name: 'deploy to google cloud run'
+#        id: deploy
+#        uses: google-github-actions/deploy-cloudrun@v1
+#        with:
+#          secrets: |
+#            POSTGRES_URL=agora-auth-service-postgres:latest
+#            SENDGRID_API_KEY=sendgrid-api-key:latest
+#            PERMISSIONS_API=agora-ip-permissions-service-internal:latest
+#          env_vars: |
+#            ENV=prod
+#            PROJECT_ID=${{ vars.PROJECT_ID }}
+#          service: ${{ vars.APP }}
+#          region: ${{ vars.REGION }}
+#          project_id: ${{ vars.PROJECT_ID }}
+#          image: ${{ env.IMAGE_NAME }}
+#          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --set-cloudsql-instances=agora-postgres --port=8080 --vpc-connector=agora-infra-connector'
+#      - name: 'show output'
+#        run: echo ${{ steps.deploy.outputs.url }}
+#
+#  deploy-internal:
+#    runs-on: ubuntu-latest
+#    needs: [ build-docker-internal ]
+#    if: github.ref == 'refs/heads/master' && success()
+#    environment: production internal
+#    permissions:
+#      contents: read
+#      id-token: write
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: 'authenticate gcloud'
+#        uses: google-github-actions/auth@v1
+#        with:
+#          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
+#          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+#      - name: 'setup gcloud'
+#        uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: ${{ vars.PROJECT_ID }}
+#      - name: 'docker auth'
+#        run: |-
+#          gcloud auth configure-docker ${{ vars.GAR_LOCATION }}-docker.pkg.dev
+#      - name: 'create image name'
+#        run: |-
+#          echo "IMAGE_NAME=${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.APP }}/${{ vars.APP }}:${{ github.sha }}" >> $GITHUB_ENV
+#      - name: 'build and push container'
+#        run: |-
+#          docker build -f Dockerfile.internal -t "${{ env.IMAGE_NAME }}" ./
+#          docker push "${{ env.IMAGE_NAME }}"
+#      - name: 'deploy to google cloud run'
+#        id: deploy
+#        uses: google-github-actions/deploy-cloudrun@v1
+#        with:
+#          env_vars: |
+#            ENV=prod
+#            PROJECT_ID=${{ vars.PROJECT_ID }}
+#          service: ${{ vars.APP }}
+#          region: ${{ vars.REGION }}
+#          project_id: ${{ vars.PROJECT_ID }}
+#          image: ${{ env.IMAGE_NAME }}
+#          flags: '--concurrency=100 --min-instances=1 --max-instances=3 --memory=512Mi --cpu=1 --platform=managed --allow-unauthenticated --port=8080 --cpu-boost --vpc-connector=agora-infra-connector --ingress=internal'
+#      - name: 'show output'
+#        run: echo ${{ steps.deploy.outputs.url }}
+#
+#  deploy-keys-rotator:
+#    runs-on: ubuntu-latest
+#    needs: [ deploy-internal ]
+#    if: github.ref == 'refs/heads/master' && success()
+#    environment: production keys rotator
+#    permissions:
+#      contents: read
+#      id-token: write
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: 'authenticate gcloud'
+#        uses: google-github-actions/auth@v1
+#        with:
+#          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
+#          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+#      - name: 'setup gcloud'
+#        uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: ${{ vars.PROJECT_ID }}
+#      - name: 'delete the previous task if any'
+#        continue-on-error: true
+#        run: |-
+#          gcloud scheduler jobs delete --location ${{ vars.REGION }} ${{ vars.TASK_NAME }} --quiet 2>/dev/null
+#      - name: 'create the task'
+#        run: |-
+#          gcloud scheduler jobs create http ${{ vars.TASK_NAME }} \
+#              --location ${{ vars.REGION }} \
+#              --description "Rotate the secret keys used to sign users tokens." \
+#              --schedule "0 4 * * *" \
+#              --uri "${{ secrets.HOST_INTERNAL }}/rotate-keys" \
+#              --http-method POST \
+#              --max-retry-attempts=5 \
+#              --attempt-deadline=120s \
+#              --max-backoff=5m \
+#              --oidc-service-account-email="${{ secrets.SCHEDULER_SERVICE_ACCOUNT }}" \
+#              --quiet
